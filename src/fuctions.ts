@@ -17,7 +17,7 @@ export function load(setLoaderValue: UseState<string>) {
   return loaderSpiner;
 
 }
-export function randomColor(count: number, setColorsPalette: UseState<RGBA[]>) {
+export function randomColor(count: number, setColorsPalette: UseState<RGBA[]>):NodeJS.Timeout {
   let newColors: RGBA[] = [];
   const colorInterval = setInterval(() => {
     for (let i = 0; i < count; i++) {

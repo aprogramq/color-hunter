@@ -1,32 +1,47 @@
 import { hexToRgb, RGBA, rgbToHex, TextAttributes } from "@opentui/core";
 import { render, useKeyboard } from "@opentui/react";
-import { useState } from "react";
-import { cc } from "bun:ffi";
-import { helloName, load, randomColor } from "./fuctions";
-import { sleepSync } from "bun";
-import randomInteger from "random-int";
+import { useReducer, useState, type ActionDispatch, type AnyActionArg } from "react";
+import { randomColor } from "./fuctions";
+import { Colors } from "./Colors";
+import type { ControlWheelProp, ActionArgs } from "./types";
 
 function App() {
-  const [input, setInput] = useState<string>("");
-  const [displayName, setDisplayName] = useState<boolean>(false);
-  const [loaderValue, setLoaderValue] = useState<string>("");
   const [colorsPalette, setColorsPalette] = useState<RGBA[]>([]);
-  const [timeout, setTimeout] = useState<NodeJS.Timeout>();
-  const [pause, setPause] = useState<boolean>(false);
   const [displaySaveButton, setDisplaySaveButton] = useState<boolean>();
   const [countColorsPalette, setCountColorsPalette] = useState<number>(3);
 
+  const [state, dispatch] = useReducer(colorReducer, { pause: true, timeout: null, displayColors: false })
+
+
+  function colorReducer(state: ControlWheelProp, action: ActionArgs) {
+    if (action.type === "pauseColorWheel")
+      return {
+        ...state,
+        pause: true,
+        timeout: state.timeout?.close()
+      }
+    else if (action.type === "startColorWheel" || action.type === "continueColorWheel")
+      return {
+        timeout: randomColor(countColorsPalette, setColorsPalette),
+        displayColors: true,
+        pause: false,
+      }
+
+  }
+
+
   useKeyboard((key) => {
     if (key.name === "space") {
-      timeout?.refresh();
+      dispatch({ type: "pauseColorWheel" })
     }
-    if (key.name === "escape") {
-      timeout?.unref();
+    else if (key.name === "s") {
+      if (!state.displayColors)
+        dispatch({ type: "startColorWheel" })
     }
-    if (key.name === "s") {
+    else if (key.name === "c") {
+      if (state.displayColors && state.pause)
+        dispatch({ type: "continueColorWheel" })
 
-      setTimeout(randomColor(countColorsPalette, setColorsPalette));
-      setDisplayName(true);
     }
   });
 
@@ -35,29 +50,12 @@ function App() {
       <box justifyContent="center" alignItems="flex-end">
         <ascii-font font="tiny" text="Color Hunter :D" />
         <text attributes={TextAttributes.DIM} fg="#7c86ff">
-          you’ll find what you need
+          You’ll find what you need
         </text>
       </box>
-      {!displayName && (
+
+      {!state.displayColors && (
         <box width={50} justifyContent="center" alignItems="center">
-          {/* <input */}
-          {/*   marginTop={1} */}
-          {/*   paddingTop={2} */}
-          {/*   textColor="white" */}
-          {/*   backgroundColor="#7c86ff" */}
-          {/*   width="70%" */}
-          {/*   placeholder="Descrbe feeling your will palette" */}
-          {/*   focused */}
-          {/*   value={input} */}
-          {/*   onInput={(value) => { */}
-          {/*     setInput(value); */}
-          {/*     // setDisplayName(false); */}
-          {/*   }} */}
-          {/*   onSubmit={() => { */}
-          {/*     setTimeout(randomColor(countColorsPalette, setColorsPalette)); */}
-          {/*     setDisplayName(true); */}
-          {/*   }} */}
-          {/* /> */}
           <box
             backgroundColor={"white"}
             padding={1}
@@ -69,29 +67,43 @@ function App() {
           </box>
         </box>
       )}
-      {displayName && (
-        <>
-          <box
-            flexDirection="row"
-            height={10}
-            width={"auto"}
-            justifyContent="center"
-            alignItems="center"
-          >
-            {colorsPalette.map((color) => (
-              <box
-                justifyContent="center"
-                alignItems="center"
-                backgroundColor={color}
-                width="10%"
-                height="60%"
-              >
-                <text justifyContent="center">{color && rgbToHex(color)}</text>
-              </box>
-            ))}
-          </box>
-        </>
+      {state.displayColors && (
+        <Colors colorsPalette={colorsPalette} />
       )}
+      {state.pause && state.displayColors ? (
+        <box flexDirection="row">
+          <box
+            backgroundColor="#000000"
+            padding={1}
+            paddingLeft={4}
+            paddingRight={4}
+            marginTop={1}
+          >
+            <text fg="#ffffff">[C]ontinue</text>
+          </box>
+          <box
+            backgroundColor={"#000000"}
+            padding={1}
+            paddingLeft={4}
+            paddingRight={4}
+            marginTop={1}
+          >
+            <text fg="#ffffff">[S]ave palette</text>
+          </box>
+
+        </box>
+      ) : null}
+      {!state.pause && state.displayColors ? (
+        <box
+          backgroundColor="#000000"
+          padding={1}
+          paddingLeft={4}
+          paddingRight={4}
+          marginTop={1}
+        >
+          <text fg="#ffffff">Press [space] to stop</text>
+        </box>
+      ) : null}
     </box>
   );
 }
