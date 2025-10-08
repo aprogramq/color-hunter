@@ -1,7 +1,7 @@
 import { hexToRgb, RGBA, rgbToHex, TextAttributes } from "@opentui/core";
 import { render, useKeyboard } from "@opentui/react";
 import { useReducer, useState, type ActionDispatch, type AnyActionArg } from "react";
-import { randomColor } from "./fuctions";
+import { randomColor, savePalette } from "./fuctions";
 import { Colors } from "./Colors";
 import type { ControlWheelProp, ActionArgs } from "./types";
 
@@ -13,20 +13,25 @@ function App() {
   const [state, dispatch] = useReducer(colorReducer, { pause: true, timeout: null, displayColors: false })
 
 
-  function colorReducer(state: ControlWheelProp, action: ActionArgs) {
-    if (action.type === "pauseColorWheel")
+  function colorReducer(state: ControlWheelProp, action: ActionArgs): ControlWheelProp {
+    if (action.type === "pauseColorWheel") {
       return {
         ...state,
         pause: true,
-        timeout: state.timeout?.close()
-      }
-    else if (action.type === "startColorWheel" || action.type === "continueColorWheel")
+        timeout: state.timeout?.close() ?? null
+      };
+    } else if (action.type === "startColorWheel" || action.type === "continueColorWheel") {
       return {
         timeout: randomColor(countColorsPalette, setColorsPalette),
         displayColors: true,
         pause: false,
-      }
-
+      };
+    }
+    else if(action.type === "test"){
+      savePalette(colorsPalette, countColorsPalette)
+      return {...state, displayColors:true}
+    }
+    return state; 
   }
 
 
@@ -37,6 +42,10 @@ function App() {
     else if (key.name === "s") {
       if (!state.displayColors)
         dispatch({ type: "startColorWheel" })
+      else{
+          dispatch({type:"test"})
+        }
+
     }
     else if (key.name === "c") {
       if (state.displayColors && state.pause)
