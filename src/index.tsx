@@ -1,56 +1,85 @@
-import { hexToRgb, RGBA, rgbToHex, TextAttributes } from "@opentui/core";
-import { render, useKeyboard } from "@opentui/react";
-import { useReducer, useState, type ActionDispatch, type AnyActionArg } from "react";
+import {
+  hexToRgb,
+  resolveRenderLib,
+  RGBA,
+  rgbToHex,
+  TextAttributes,
+} from "@opentui/core";
+import { render, useKeyboard, useOnResize, useRenderer } from "@opentui/react";
+import {
+  useEffect,
+  useReducer,
+  useState,
+  type ActionDispatch,
+  type AnyActionArg,
+} from "react";
 import { randomColor, savePalette } from "./fuctions";
-import { Colors } from "./Colors";
+import { Palette } from "./Colors";
 import type { ControlWheelProp, ActionArgs } from "./types";
+import { writeFileSync, writeSync } from "fs";
 
 function App() {
-  const [colorsPalette, setColorsPalette] = useState<RGBA[]>([]);
+  const [colorsPalette, setColorsPalette] = useState<RGBA[][]>([[]]);
   const [displaySaveButton, setDisplaySaveButton] = useState<boolean>();
   const [countColorsPalette, setCountColorsPalette] = useState<number>(3);
+  const [position, setPosition] = useState<number>(0);
 
-  const [state, dispatch] = useReducer(colorReducer, { pause: true, timeout: null, displayColors: false })
+  const [state, dispatch] = useReducer(colorReducer, {
+    pause: true,
+    timeout: null,
+    displayColors: false,
+  });
 
-
-  function colorReducer(state: ControlWheelProp, action: ActionArgs): ControlWheelProp {
+  function colorReducer(
+    state: ControlWheelProp,
+    action: ActionArgs,
+  ): ControlWheelProp {
     if (action.type === "pauseColorWheel") {
       return {
         ...state,
         pause: true,
-        timeout: state.timeout?.close() ?? null
+        timeout: state.timeout?.close() ?? null,
       };
-    } else if (action.type === "startColorWheel" || action.type === "continueColorWheel") {
+    } else if (
+      action.type === "startColorWheel" ||
+      action.type === "continueColorWheel"
+    ) {
+      if (action.type === "continueColorWheel")
+        setPosition(colorsPalette.length - 1);
       return {
-        timeout: randomColor(countColorsPalette, setColorsPalette),
+        timeout: randomColor(
+          countColorsPalette,
+          setColorsPalette,
+          colorsPalette,
+          setPosition,
+        ),
         displayColors: true,
         pause: false,
       };
+    } else if (action.type === "savePalette") {
+      savePalette(colorsPalette, countColorsPalette, position);
+      return { ...state, displayColors: true };
     }
-    else if(action.type === "test"){
-      savePalette(colorsPalette, countColorsPalette)
-      return {...state, displayColors:true}
-    }
-    return state; 
+    return state;
   }
-
 
   useKeyboard((key) => {
     if (key.name === "space") {
-      dispatch({ type: "pauseColorWheel" })
-    }
-    else if (key.name === "s") {
-      if (!state.displayColors)
-        dispatch({ type: "startColorWheel" })
-      else{
-          dispatch({type:"test"})
-        }
-
-    }
-    else if (key.name === "c") {
-      if (state.displayColors && state.pause)
-        dispatch({ type: "continueColorWheel" })
-
+      dispatch({ type: "pauseColorWheel" });
+    } else if (key.name === "s") {
+      if (!state.displayColors) dispatch({ type: "startColorWheel" });
+      else if (state.pause && state.displayColors)
+        dispatch({ type: "savePalette" });
+    } else if (key.name === "c" && state.displayColors && state.pause) {
+      dispatch({ type: "continueColorWheel" });
+    } else if (key.name === "b" && state.pause && position > 1) {
+      setPosition((pos) => pos - 1);
+    } else if (
+      key.name === "n" &&
+      state.pause &&
+      position < colorsPalette.length - 1
+    ) {
+      setPosition((pos) => pos + 1);
     }
   });
 
@@ -61,6 +90,7 @@ function App() {
         <text attributes={TextAttributes.DIM} fg="#7c86ff">
           You’ll find what you need
         </text>
+        {/* <text>Position:{position}</text> */}
       </box>
 
       {!state.displayColors && (
@@ -77,31 +107,51 @@ function App() {
         </box>
       )}
       {state.displayColors && (
-        <Colors colorsPalette={colorsPalette} />
+        <Palette colorsPalette={colorsPalette} position={position} />
       )}
-      {state.pause && state.displayColors ? (
-        <box flexDirection="row">
-          <box
-            backgroundColor="#000000"
-            padding={1}
-            paddingLeft={4}
-            paddingRight={4}
-            marginTop={1}
-          >
-            <text fg="#ffffff">[C]ontinue</text>
-          </box>
-          <box
-            backgroundColor={"#000000"}
-            padding={1}
-            paddingLeft={4}
-            paddingRight={4}
-            marginTop={1}
-          >
-            <text fg="#ffffff">[S]ave palette</text>
-          </box>
 
-        </box>
-      ) : null}
+      {/*   {state.pause && position > 0 && state.displayColors && (             */}
+      {/* )} */}
+      {/*   {state.pause && position < colorsPalette.length - 1 && state.displayColors && (             */}
+      {/* )} */}
+      {state.pause && state.displayColors && (
+        <>
+          {/* TODO: Add logic to arrows  */}
+          <text
+            fg="#ffffff"
+            position="absolute"
+            left={25}
+            top={12}
+          >{`<-- [B]ack`}</text>
+          <text
+            fg="#ffffff"
+            position="absolute"
+            right={25}
+            top={12}
+          >{`[N]ext -->`}</text>
+
+          <box flexDirection="row">
+            <box
+              backgroundColor="#000000"
+              padding={1}
+              paddingLeft={4}
+              paddingRight={4}
+              marginTop={1}
+            >
+              <text fg="#ffffff">[C]ontinue</text>
+            </box>
+            <box
+              backgroundColor={"#000000"}
+              padding={1}
+              paddingLeft={4}
+              paddingRight={4}
+              marginTop={1}
+            >
+              <text fg="#ffffff">[S]ave palette</text>
+            </box>
+          </box>
+        </>
+      )}
       {!state.pause && state.displayColors ? (
         <box
           backgroundColor="#000000"

@@ -10,9 +10,9 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.80",
     "@opentui/core": "^0.1.25",
     "@opentui/react": "^0.1.25",
-    "canvas": "^3.2.0",
     "random-int": "^3.1.0",
     "react": "^19.2.0"
   }

@@ -3,5 +3,5 @@
     timeout: NodeJS.Timeout | null
     displayColors: boolean
   }
-  export type ActionArgs = { type: "pauseColorWheel" } | { type: "startColorWheel" } | { type: "continueColorWheel" }
+  export type ActionArgs = { type: "pauseColorWheel" } | { type: "startColorWheel" } | { type: "continueColorWheel" } | {type:"savePalette"}
 
