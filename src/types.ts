@@ -1,7 +1,15 @@
-  export interface ControlWheelProp  {
-    pause: boolean,
-    timeout: NodeJS.Timeout | null
-    displayColors: boolean
-  }
-  export type ActionArgs = { type: "pauseColorWheel" } | { type: "startColorWheel" } | { type: "continueColorWheel" } | {type:"savePalette"}
+export interface ControlWheelProp {
+	pause: boolean,
+	timeout: NodeJS.Timeout | null
+	displayColors: boolean
+}
+export type ActionArgs =
+	{ type: "pauseColorWheel" } |
+	{ type: "startColorWheel" } |
+	{ type: "continueColorWheel" } |
+	{ type: "savePalette" } |
+	{ type: "backToStartScreen" }
 
+export type HexValue = string;
+
+export type OptionValue = string | "default" | "cold" | "warm" | "pastel"

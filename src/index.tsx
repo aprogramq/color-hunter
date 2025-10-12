@@ -1,6 +1,6 @@
 import { RGBA, TextAttributes } from '@opentui/core'
 import { render, useKeyboard, useRenderer } from '@opentui/react'
-import { useEffect, useReducer, useState } from 'react'
+import { useReducer, useState } from 'react'
 import { randomColor, savePaletteWrapedC } from './fuctions'
 import { Palette } from './components/Colors'
 import type { ControlWheelProp, ActionArgs } from './types'
@@ -9,12 +9,24 @@ function App() {
 	const [colorsPalette, setColorsPalette] = useState<RGBA[][]>([[]])
 	const [countColorsPalette, setCountColorsPalette] = useState<number>(3)
 	const [position, setPosition] = useState<number>(0)
+	const [selectedIndex, setSelectedIndex] = useState(0)
 	const render = useRenderer()
+
+	const options = [
+		{ name: 'Default', description: '', value: 'default' },
+		{ name: 'Cold color', description: '', value: 'cold' },
+		{ name: 'Warm color', description: '', value: 'warm' },
+		{ name: 'Pastel color', description: '', value: 'pastel' },
+	]
+
+	const height: number = render.height
+	const width: number = render.width
+
 	// useEffect(() => {
 	// 	render.console.show()
 	// 	render.terminalHeight
+	// 	console.log(width)
 	// })
-	const height:number = render.height
 	const [state, dispatch] = useReducer(colorReducer, {
 		pause: true,
 		timeout: null,
@@ -31,14 +43,19 @@ function App() {
 		} else if (action.type === 'startColorWheel' || action.type === 'continueColorWheel') {
 			if (action.type === 'continueColorWheel') setPosition(colorsPalette.length - 1)
 			return {
-				timeout: randomColor(countColorsPalette, setColorsPalette, setPosition),
+				timeout: randomColor(countColorsPalette, setColorsPalette, setPosition, options[selectedIndex]!.value),
 				displayColors: true,
 				pause: false,
 			}
 		} else if (action.type === 'savePalette') {
 			savePaletteWrapedC(colorsPalette[position]!, countColorsPalette)
 			return { ...state, displayColors: true }
+		} else if (action.type === 'backToStartScreen') {
+			setPosition(0)
+			setColorsPalette([[]])
+			return { ...state, displayColors: false, timeout: state.timeout?.close() ?? null }
 		}
+
 		return state
 	}
 
@@ -54,6 +71,8 @@ function App() {
 			setPosition((pos) => pos - 1)
 		} else if (key.name === 'n' && state.pause && position < colorsPalette.length - 1) {
 			setPosition((pos) => pos + 1)
+		} else if (key.name === 'e' && state.displayColors) {
+			dispatch({ type: 'backToStartScreen' })
 		}
 	})
 
@@ -64,17 +83,31 @@ function App() {
 				<text attributes={TextAttributes.DIM} fg="#7c86ff">
 					You’ll find what you need
 				</text>
-				{/* <text>Position:{position}</text> */}
 			</box>
 
 			{!state.displayColors && (
-				<box width={50} justifyContent="center" alignItems="center">
-					<box backgroundColor={'white'} padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
-						<text fg="#000000">[S]tart</text>
+				<>
+					<box width={50} justifyContent="center" alignItems="center">
+						<box backgroundColor={'white'} padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
+							<text fg="#000000">[S]tart</text>
+						</box>
+						<select
+							marginTop={1}
+							paddingTop={1}
+							style={{ height: 2, width: 20 }}
+							options={options}
+							focused={true}
+							onChange={(index, option) => {
+								setSelectedIndex(index)
+								console.log('Selected:', option)
+							}}
+						/>
 					</box>
-				</box>
+				</>
 			)}
-			{state.displayColors && <Palette colorsPalette={colorsPalette} position={position} />}
+			{state.displayColors && (
+				<Palette colorsPalette={colorsPalette} position={position} width={width} count={countColorsPalette} />
+			)}
 
 			{/*   {state.pause && position > 0 && state.displayColors && (             */}
 			{/* )} */}
@@ -83,8 +116,9 @@ function App() {
 			{state.pause && state.displayColors && (
 				<>
 					{/* TODO: Add logic to arrows  */}
-					<text fg="#ffffff" position="absolute" left={25} top={height / 2}>{`<-- [B]ack`}</text>
-					<text fg="#ffffff" position="absolute" right={25} top={height / 2}>{`[N]ext -->`}</text>
+
+					<text fg="#ffffff" position="absolute" right={width / 1.4} top={height / 2}>{`<-- [B]ack`}</text>
+					<text fg="#ffffff" position="absolute" left={width / 1.4} top={height / 2}>{`[N]ext -->`}</text>
 
 					<box flexDirection="row">
 						<box backgroundColor="#000000" padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>

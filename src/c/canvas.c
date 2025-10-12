@@ -28,7 +28,6 @@ void save_palette(int count, char **hex) {
     struct passwd *pw = getpwuid(uid);
 
     sprintf(path_to_save, "/home/%s/Pictures/palette/example.svg", pw->pw_name);
-    printf("\t%s", path_to_save);
     cairo_surface_t *surface = cairo_svg_surface_create(path_to_save, 500, 500);
 
     cairo_t *cr = cairo_create(surface);

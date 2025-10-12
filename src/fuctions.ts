@@ -1,6 +1,8 @@
 import { hexToRgb, RGBA, rgbToHex } from "@opentui/core";
 import { type Dispatch, type SetStateAction } from "react";
 import { cc, ptr } from "bun:ffi"
+import { HexColor, HexColorCold, HexColorPastele, HexColorWarm } from "./hex";
+import type { OptionValue } from "./types";
 
 export const {
 	symbols: { save_palette },
@@ -15,9 +17,6 @@ export const {
 	},
 })
 
-function getRandomInt(max: number) {
-	return Math.floor(Math.random() * max)
-}
 
 type UseState<T> = Dispatch<SetStateAction<T>>;
 
@@ -32,33 +31,33 @@ export function load(setLoaderValue: UseState<string>) {
 	return loaderSpiner;
 
 }
-export function randomColor(count: number, setColorsPalette: UseState<RGBA[][]>, setPosition: UseState<number>): NodeJS.Timeout {
+export function randomColor(count: number, setColorsPalette: UseState<RGBA[][]>, setPosition: UseState<number>, option:OptionValue): NodeJS.Timeout {
 	const colorInterval = setInterval(() => {
-		const newColors: RGBA[] = [];
+		const newColors: HexColor[] = [];
 		for (let i = 0; i < count; i++) {
-			let randomDecimal = getRandomInt(16777215);
-			const isColor = /^([0-9a-f]{3}){1,2}$/i;
-			const colorHex = randomDecimal.toString(16)
-			let colorRgb;
+			let color = new HexColor;
 
-			if (!isColor.test(colorHex)) {
-				console.log("change")
-				randomDecimal = getRandomInt(16777215)
-				colorRgb = RGBA.fromHex(randomDecimal.toString(16))
-			} else {
-				colorRgb = hexToRgb(colorHex)
+			if (option == "cold")
+				color = new HexColorCold
+			else if (option == 'pastel')
+				color = new HexColorPastele
+			else if (option == 'warm')
+				color = new HexColorWarm
+
+			newColors.push(color);
+			if (newColors.length > 1) {
+				color.correctChanels(newColors[i - 1]!)
 			}
-
-			newColors.push(hexToRgb(randomDecimal.toString(16)));
 		}
 
-		setColorsPalette((prevColorsPalette) => [...prevColorsPalette, newColors])
+		const rgbColors: RGBA[] = newColors.map((color) => hexToRgb(color.get()))
+		setColorsPalette((prevColorsPalette) => [...prevColorsPalette, rgbColors])
 		setPosition((pos: number) => pos + 1)
 	}, 300);
 	return colorInterval;
 }
 
-export function savePaletteWrapedC(palette:RGBA[], countColorsPalette:number) {
+export function savePaletteWrapedC(palette: RGBA[], countColorsPalette: number) {
 
 	const paletteHex: ArrayLike<string>[] = []
 	palette.forEach((rgb) => paletteHex.push(rgbToHex(rgb).replace('#', '')))

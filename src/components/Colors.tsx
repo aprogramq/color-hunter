@@ -1,9 +1,9 @@
 import { type RGBA, rgbToHex } from "@opentui/core";
 
-export function Palette({ colorsPalette, position }: { colorsPalette: RGBA[][], position:number }) {
+export function Palette({ colorsPalette, position, width, count }: { colorsPalette: RGBA[][], position:number, width:number, count:number }) {
   const colorsDisplay = [];
 
-  for (let i = 0; i < 3; i++)
+  for (let i = 0; i < count; i++)
     colorsDisplay.push(
       <box
         justifyContent="center"
@@ -22,7 +22,7 @@ export function Palette({ colorsPalette, position }: { colorsPalette: RGBA[][], 
       <box
         flexDirection="row"
         height={10}
-        width="100%"
+        width={160}
         justifyContent="center"
         alignItems="center"
       >
