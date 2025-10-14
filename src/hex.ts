@@ -1,9 +1,9 @@
 import type { HexValue } from "./types";
 
-export class HexColor {
-	red: HexValue = this.rangeHex(0, 256);
-	green: HexValue = this.rangeHex(0, 256);
-	blue: HexValue = this.rangeHex(0, 256);
+class BaseHexColor {
+	red: HexValue = "000000"
+	green: HexValue = "000000"
+	blue: HexValue = "000000";
 
 	randomHex(): string {
 		let hex: HexValue = Math.floor(Math.random() * 255).toString(16)
@@ -19,6 +19,17 @@ export class HexColor {
 	get(): string {
 		return "#" + this.red + this.green + this.blue
 	}
+
+}
+
+export class HexColor extends BaseHexColor {
+	constructor() {
+		super()
+		this.red = this.rangeHex(0, 256);
+		this.green = this.rangeHex(0, 256);
+		this.blue = this.rangeHex(0, 256);
+	}
+
 
 	correctChanels(PrevHexColor: HexColor) { }
 
@@ -63,19 +74,6 @@ export class HexColorWarm extends HexColor {
 		const intRed = parseInt(this.red, 16);
 		const intGreen = parseInt(this.green, 16)
 		const intBlue = parseInt(this.blue, 16)
-
-		// if (intRed < parseInt(PrevHexColor.red, 16)) {
-		//
-		// 	this.red = this.rangeHex(intRed, 255-(parseInt(PrevHexColor.red, 16) ))
-		// 	if (parseInt(this.red, 16) < 10)
-		// 		this.red = "0" + this.red
-		// 	console.log(parseInt(this.red,16 ))
-		// }
-		// if (parseInt(this.red, 16) - parseInt(PrevHexColor.red, 16) < 75)
-		// 	this.red = (parseInt(this.red, 16) + parseInt(this.rangeHex(75, 100), 16)).toString(16)
-		//
-		// if (parseInt(this.green, 16) - parseInt(PrevHexColor.green, 16) < 40)
-		// 	this.green = (parseInt(this.green, 16) + parseInt(this.rangeHex(40, 100), 16)).toString(16)
 	}
 }
 export class HexColorPastele extends HexColor {
