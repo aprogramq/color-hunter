@@ -1,13 +1,13 @@
-import { hexToRgb, RGBA, rgbToHex } from "@opentui/core";
+import { ConsolePosition, hexToRgb, RGBA, rgbToHex } from "@opentui/core";
 import { type Dispatch, type SetStateAction } from "react";
 import { cc, ptr } from "bun:ffi"
-import { HexColor, HexColorCold, HexColorPastele, HexColorWarm } from "./hex";
+import { BaseHexColor, HexColor, HexColorCold, HexColorPastele, HexColorWarm } from "./hex";
 import type { OptionValue } from "./types";
 
 export const {
 	symbols: { save_palette },
 } = cc({
-	source: "/home/aprogramb/projects/color-hunter/src/c/canvas.c",
+	source: "/home/aprogramb/projects/javascript/color-hunter/src/c/canvas.c",
 	library: "cairo",
 	include: ["/usr/include/cairo", "/usr/include/libpng16", "/usr/include/freetype2", "/usr/include/pixman-1"],
 	symbols: {
@@ -16,7 +16,6 @@ export const {
 		},
 	},
 })
-
 
 type UseState<T> = Dispatch<SetStateAction<T>>;
 
@@ -31,9 +30,10 @@ export function load(setLoaderValue: UseState<string>) {
 	return loaderSpiner;
 
 }
-export function randomColor(count: number, setColorsPalette: UseState<RGBA[][]>, setPosition: UseState<number>, option:OptionValue): NodeJS.Timeout {
+export function randomColor(count: number, setColorsPalette: UseState<BaseHexColor[][]>, setPosition: UseState<number>, option: OptionValue): NodeJS.Timeout {
+	// console.log(process.cwd())
 	const colorInterval = setInterval(() => {
-		const newColors: HexColor[] = [];
+		const newColors: BaseHexColor[] = [];
 		for (let i = 0; i < count; i++) {
 			let color = new HexColor;
 
@@ -50,8 +50,8 @@ export function randomColor(count: number, setColorsPalette: UseState<RGBA[][]>,
 			}
 		}
 
-		const rgbColors: RGBA[] = newColors.map((color) => hexToRgb(color.get()))
-		setColorsPalette((prevColorsPalette) => [...prevColorsPalette, rgbColors])
+		// const rgbColors: RGBA[] = newColors.map((color) => hexToRgb(color.get()))
+		setColorsPalette((prevColorsPalette) => [...prevColorsPalette, newColors])
 		setPosition((pos: number) => pos + 1)
 	}, 300);
 	return colorInterval;

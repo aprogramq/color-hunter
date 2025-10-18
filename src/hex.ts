@@ -1,6 +1,8 @@
 import type { HexValue } from "./types";
 
-class BaseHexColor {
+export class BaseHexColor {
+
+	textColor: string = "#ffffff";
 	red: HexValue = "000000"
 	green: HexValue = "000000"
 	blue: HexValue = "000000";
@@ -16,10 +18,11 @@ class BaseHexColor {
 		return hex
 	}
 
-	get(): string {
+	get(): HexValue {
 		return "#" + this.red + this.green + this.blue
 	}
 
+	correctChanels(PrevHexColor: HexColor) { }
 }
 
 export class HexColor extends BaseHexColor {
@@ -31,16 +34,16 @@ export class HexColor extends BaseHexColor {
 	}
 
 
-	correctChanels(PrevHexColor: HexColor) { }
+	override correctChanels(PrevHexColor: HexColor) { }
 
 }
 
 export class HexColorCold extends HexColor {
 	constructor() {
 		super()
-		this.red = this.rangeHex(0, 135);
-		this.green = this.rangeHex(0, 135);
-		this.blue = this.rangeHex(150, 256);
+		this.red = this.rangeHex(50, 128);
+		this.green = this.rangeHex(50, 128);
+		this.blue = this.rangeHex(100, 256);
 	}
 
 	override correctChanels(PrevHexColor: HexColor) {
@@ -48,8 +51,8 @@ export class HexColorCold extends HexColor {
 		const intGreen = parseInt(this.green, 16)
 		const intBlue = parseInt(this.blue, 16)
 
-		if (intRed - parseInt(PrevHexColor.red, 16) < 75)
-			this.red = (intRed + parseInt(this.rangeHex(75, 100), 16)).toString(16)
+		// if (intRed - parseInt(PrevHexColor.red, 16) < 75)
+		// 	this.red = (intRed + parseInt(this.rangeHex(75, 100), 16)).toString(16)
 
 		if (intGreen - parseInt(PrevHexColor.green, 16) < 40)
 			this.green = (intGreen + parseInt(this.rangeHex(40, 100), 16)).toString(16)
@@ -59,7 +62,6 @@ export class HexColorCold extends HexColor {
 		}
 
 
-		console.log(`red: ${this.red} green:${this.green} blue:${this.blue}`)
 	}
 }
 export class HexColorWarm extends HexColor {
@@ -79,9 +81,10 @@ export class HexColorWarm extends HexColor {
 export class HexColorPastele extends HexColor {
 	constructor() {
 		super()
+		this.textColor = "#111111"
 		this.red = this.rangeHex(150, 256);
 		this.green = this.rangeHex(150, 256);
-		this.blue = this.rangeHex(150, 256);
+		this.blue = this.rangeHex(150, 256)
 	}
 
 	override correctChanels(PrevHexColor: HexColor) {

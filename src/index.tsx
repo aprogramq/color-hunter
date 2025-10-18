@@ -1,16 +1,18 @@
 import { RGBA, TextAttributes } from '@opentui/core'
 import { render, useKeyboard, useRenderer } from '@opentui/react'
-import { useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { randomColor, savePaletteWrapedC } from './fuctions'
 import { Palette } from './components/Colors'
 import type { ControlWheelProp, ActionArgs } from './types'
+import type { BaseHexColor } from './hex'
 
 function App() {
-	const [colorsPalette, setColorsPalette] = useState<RGBA[][]>([[]])
+	const [colorsPalette, setColorsPalette] = useState<BaseHexColor[][]>([[]])
 	const [countColorsPalette, setCountColorsPalette] = useState<number>(3)
 	const [position, setPosition] = useState<number>(0)
 	const [selectedIndex, setSelectedIndex] = useState(0)
 	const render = useRenderer()
+	console.log(colorsPalette)
 
 	const options = [
 		{ name: 'Default', description: '', value: 'default' },
@@ -22,11 +24,10 @@ function App() {
 	const height: number = render.height
 	const width: number = render.width
 
-	// useEffect(() => {
-	// 	render.console.show()
-	// 	render.terminalHeight
-	// 	console.log(width)
-	// })
+	useEffect(() => {
+		render.console.show()
+		render.terminalHeight
+	})
 	const [state, dispatch] = useReducer(colorReducer, {
 		pause: true,
 		timeout: null,
@@ -43,12 +44,17 @@ function App() {
 		} else if (action.type === 'startColorWheel' || action.type === 'continueColorWheel') {
 			if (action.type === 'continueColorWheel') setPosition(colorsPalette.length - 1)
 			return {
-				timeout: randomColor(countColorsPalette, setColorsPalette, setPosition, options[selectedIndex]!.value),
+				timeout: randomColor(
+					countColorsPalette,
+					setColorsPalette,
+					setPosition,
+					options[selectedIndex]!.value
+				),
 				displayColors: true,
 				pause: false,
 			}
 		} else if (action.type === 'savePalette') {
-			savePaletteWrapedC(colorsPalette[position]!, countColorsPalette)
+			// savePaletteWrapedC(colorsPalette[position]!, countColorsPalette)
 			return { ...state, displayColors: true }
 		} else if (action.type === 'backToStartScreen') {
 			setPosition(0)
@@ -88,7 +94,13 @@ function App() {
 			{!state.displayColors && (
 				<>
 					<box width={50} justifyContent="center" alignItems="center">
-						<box backgroundColor={'white'} padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
+						<box
+							backgroundColor={'white'}
+							padding={1}
+							paddingLeft={4}
+							paddingRight={4}
+							marginTop={1}
+						>
 							<text fg="#000000">[S]tart</text>
 						</box>
 						<select
@@ -99,14 +111,18 @@ function App() {
 							focused={true}
 							onChange={(index, option) => {
 								setSelectedIndex(index)
-								console.log('Selected:', option)
 							}}
 						/>
 					</box>
 				</>
 			)}
-			{state.displayColors && (
-				<Palette colorsPalette={colorsPalette} position={position} width={width} count={countColorsPalette} />
+			{state.displayColors && colorsPalette && (
+				<Palette
+					colorsPalette={colorsPalette}
+					position={position}
+					width={width}
+					count={countColorsPalette}
+				/>
 			)}
 
 			{/*   {state.pause && position > 0 && state.displayColors && (             */}
@@ -117,14 +133,36 @@ function App() {
 				<>
 					{/* TODO: Add logic to arrows  */}
 
-					<text fg="#ffffff" position="absolute" right={width / 1.4} top={height / 2}>{`<-- [B]ack`}</text>
-					<text fg="#ffffff" position="absolute" left={width / 1.4} top={height / 2}>{`[N]ext -->`}</text>
+					<text
+						fg="#ffffff"
+						position="absolute"
+						right={width / 1.4}
+						top={height / 2}
+					>{`<-- [B]ack`}</text>
+					<text
+						fg="#ffffff"
+						position="absolute"
+						left={width / 1.4}
+						top={height / 2}
+					>{`[N]ext -->`}</text>
 
 					<box flexDirection="row">
-						<box backgroundColor="#000000" padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
+						<box
+							backgroundColor="#000000"
+							padding={1}
+							paddingLeft={4}
+							paddingRight={4}
+							marginTop={1}
+						>
 							<text fg="#ffffff">[C]ontinue</text>
 						</box>
-						<box backgroundColor={'#000000'} padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
+						<box
+							backgroundColor={'#000000'}
+							padding={1}
+							paddingLeft={4}
+							paddingRight={4}
+							marginTop={1}
+						>
 							<text fg="#ffffff">[S]ave palette</text>
 						</box>
 					</box>

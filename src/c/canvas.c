@@ -24,10 +24,10 @@ struct RGB hexToRGB(const char *hex);
 char *alloc_cstring(const char *js_string) { return strdup(js_string); }
 char *path_to_save();
 
-// int main() {
-//     char *color_palette[3] = {"111111", "222222", "333333"};
-//     save_palette(3, color_palette);
-// }
+int main() {
+    char *color_palette[3] = {"111111", "222222", "333333"};
+    save_palette(3, color_palette);
+}
 
 void save_palette(int count, char **hex) {
     // for (int i = 0; i < count; i++) {
@@ -47,7 +47,7 @@ void save_palette(int count, char **hex) {
     int x_position = 60;
 
     for (int i = 0; i < count; i++) {
-        char *hex_color = calloc(8, sizeof(char));
+        char *hex_color = (char *)calloc(8, sizeof(char));
         *hex_color = '#';
         // printf("%f, %f, %f\n", colors[i].r, colors[i].g, colors[i].b);
         cairo_set_source_rgb(cr, colors[i].r / 255.0f, colors[i].g / 255.0f,
@@ -80,9 +80,9 @@ char *path_to_save() {
     uid_t uid = getuid();
     struct passwd *pw = getpwuid(uid);
 
-    char *path_to_palette =
-        malloc((strlen(path_template) - PLACEHOLDER + strlen(pw->pw_name) + 1) *
-               sizeof(char));
+    char *path_to_palette = (char *)malloc(
+        (strlen(path_template) - PLACEHOLDER + strlen(pw->pw_name) + 1) *
+        sizeof(char));
     sprintf(path_to_palette, path_template, pw->pw_name);
 
     DIR *palette_dir = opendir(path_to_palette);
@@ -95,7 +95,8 @@ char *path_to_save() {
     }
     sprintf(name, name, palette_number);
 
-    char *file_name = calloc(1, (strlen("palette_%d.svg") + MAX_COUNT_PALETTE));
+    char *file_name =
+        (char *)calloc(1, (strlen("palette_%d.svg") + MAX_COUNT_PALETTE));
 
     if (palette_number > 0) {
         strcpy(file_name, name);
