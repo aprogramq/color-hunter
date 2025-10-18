@@ -1,6 +1,11 @@
+#include "./iosevka_data.h"
+#include <cairo/cairo-ft.h>
 #include <cairo/cairo-svg.h>
 #include <cairo/cairo.h>
 #include <dirent.h>
+#include <fontconfig/fontconfig.h>
+#include <freetype2/freetype/freetype.h>
+#include <freetype2/ft2build.h>
 #include <pwd.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -16,7 +21,7 @@ struct RGB {
     double b;
 };
 
-void save_palette(int count, char **hex);
+void save_palette(int count, char **hex, char **text_colors);
 char *alloc_cstring(const char *js_string);
 int hex_to_int(const char *hex);
 struct RGB hexToRGB(const char *hex);
@@ -26,40 +31,45 @@ char *path_to_save();
 
 int main() {
     char *color_palette[3] = {"111111", "222222", "333333"};
-    save_palette(3, color_palette);
+    save_palette(3, color_palette, color_palette);
 }
 
-void save_palette(int count, char **hex) {
-    // for (int i = 0; i < count; i++) {
-    //   printf("hex[%d] address: %p, content: %s\n", i, (void *)hex[i],
-    //   hex[i]);
-    // }
+void save_palette(int count, char **hex, char **text_colors) {
+    FT_Library library;
+    FT_Face face;
+    FT_Init_FreeType(&library);
+    FT_New_Memory_Face(library, IosevkaSS01_Medium_ttf,
+                       IosevkaSS01_Medium_ttf_len, 0, &face);
 
     char *path_to_palette = path_to_save();
     cairo_surface_t *surface =
         cairo_svg_surface_create(path_to_palette, 500, 500);
     cairo_t *cr = cairo_create(surface);
-    struct RGB colors[count];
 
+    struct RGB colors[count];
+    struct RGB text_rgb[count];
     for (int i = 0; i < count; i++) {
         colors[i] = hexToRGB(hex[i]);
+        text_rgb[i] = hexToRGB(text_colors[i]);
     }
+    printf("\t%f, %f, %f\n", text_rgb[0].r, text_rgb[0].g, text_rgb[0].b);
+
     int x_position = 60;
 
     for (int i = 0; i < count; i++) {
         char *hex_color = (char *)calloc(8, sizeof(char));
         *hex_color = '#';
-        // printf("%f, %f, %f\n", colors[i].r, colors[i].g, colors[i].b);
         cairo_set_source_rgb(cr, colors[i].r / 255.0f, colors[i].g / 255.0f,
                              colors[i].b / 255.0f);
         cairo_rectangle(cr, 169 * i, 150, 170, 200);
         cairo_fill(cr);
 
-        cairo_font_face_t *font = cairo_toy_font_face_create(
-            "Iosevka", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+        cairo_font_face_t *font =
+            cairo_ft_font_face_create_for_ft_face(face, 0);
         cairo_set_font_face(cr, font);
         cairo_set_font_size(cr, 14.0f);
-        cairo_set_source_rgb(cr, 1, 1, 1);
+        cairo_set_source_rgb(cr, text_rgb[i].r / 255.0f, text_rgb[i].g / 255.0f,
+                             text_rgb[i].b / 255.0f);
         cairo_move_to(cr, (i + 1) * x_position, 250);
         if (i < 1)
             x_position += 53;

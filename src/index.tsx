@@ -1,4 +1,4 @@
-import { RGBA, TextAttributes } from '@opentui/core'
+import { hexToRgb, RGBA, TextAttributes } from '@opentui/core'
 import { render, useKeyboard, useRenderer } from '@opentui/react'
 import { useEffect, useReducer, useState } from 'react'
 import { randomColor, savePaletteWrapedC } from './fuctions'
@@ -12,7 +12,6 @@ function App() {
 	const [position, setPosition] = useState<number>(0)
 	const [selectedIndex, setSelectedIndex] = useState(0)
 	const render = useRenderer()
-	console.log(colorsPalette)
 
 	const options = [
 		{ name: 'Default', description: '', value: 'default' },
@@ -24,10 +23,9 @@ function App() {
 	const height: number = render.height
 	const width: number = render.width
 
-	useEffect(() => {
-		render.console.show()
-		render.terminalHeight
-	})
+	// useEffect(() => {
+	// 	render.console.show()
+	// })
 	const [state, dispatch] = useReducer(colorReducer, {
 		pause: true,
 		timeout: null,
@@ -54,7 +52,7 @@ function App() {
 				pause: false,
 			}
 		} else if (action.type === 'savePalette') {
-			// savePaletteWrapedC(colorsPalette[position]!, countColorsPalette)
+			savePaletteWrapedC(colorsPalette[position]!, countColorsPalette)
 			return { ...state, displayColors: true }
 		} else if (action.type === 'backToStartScreen') {
 			setPosition(0)
@@ -106,7 +104,7 @@ function App() {
 						<select
 							marginTop={1}
 							paddingTop={1}
-							style={{ height: 2, width: 20 }}
+							style={{ height: 8, width: 20, selectedTextColor: "white", focusedTextColor:"#333333" }}
 							options={options}
 							focused={true}
 							onChange={(index, option) => {

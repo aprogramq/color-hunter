@@ -3,9 +3,9 @@ import type { HexValue } from "./types";
 export class BaseHexColor {
 
 	textColor: string = "#ffffff";
-	red: HexValue = "000000"
-	green: HexValue = "000000"
-	blue: HexValue = "000000";
+	red: HexValue = "00"
+	green: HexValue = "00"
+	blue: HexValue = "00";
 
 	randomHex(): string {
 		let hex: HexValue = Math.floor(Math.random() * 255).toString(16)
@@ -81,14 +81,15 @@ export class HexColorWarm extends HexColor {
 export class HexColorPastele extends HexColor {
 	constructor() {
 		super()
-		this.textColor = "#111111"
 		this.red = this.rangeHex(150, 256);
 		this.green = this.rangeHex(150, 256);
 		this.blue = this.rangeHex(150, 256)
+		this.textColor = `#${(parseInt(this.red, 16) - 100).toString(16)}${(parseInt(this.green, 16) - 100).toString(16)}${(parseInt(this.blue, 16) - 100).toString(16)}`
 	}
 
 	override correctChanels(PrevHexColor: HexColor) {
 	}
+
 }
 
 
