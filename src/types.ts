@@ -13,3 +13,10 @@ export type ActionArgs =
 export type HexValue = string;
 
 export type OptionValue = string | "default" | "cold" | "warm" | "pastel"
+
+export const options = [
+	{ name: 'Default', description: '', value: 'default' },
+	{ name: 'Cold color', description: '', value: 'cold' },
+	{ name: 'Warm color', description: '', value: 'warm' },
+	{ name: 'Pastel color', description: '', value: 'pastel' },
+]

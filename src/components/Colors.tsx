@@ -1,4 +1,3 @@
-import { ConsolePosition, hexToRgb, type RGBA, rgbToHex } from '@opentui/core'
 import type { BaseHexColor } from '../hex'
 
 export function Palette({

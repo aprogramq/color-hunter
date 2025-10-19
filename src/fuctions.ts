@@ -1,5 +1,5 @@
 import { type Dispatch, type SetStateAction } from "react";
-import { cc, dlopen, ptr } from "bun:ffi"
+import { dlopen, ptr } from "bun:ffi"
 import { BaseHexColor, HexColor, HexColorCold, HexColorPastele, HexColorWarm } from "./hex";
 import type { OptionValue } from "./types";
 import { canvasSo } from "./c/canvas.ts";
@@ -41,6 +41,7 @@ export function load(setLoaderValue: UseState<string>) {
 }
 export function randomColor(count: number, setColorsPalette: UseState<BaseHexColor[][]>, setPosition: UseState<number>, option: OptionValue): NodeJS.Timeout {
 	const colorInterval = setInterval(() => {
+
 		const newColors: BaseHexColor[] = [];
 		for (let i = 0; i < count; i++) {
 			let color = new HexColor;
