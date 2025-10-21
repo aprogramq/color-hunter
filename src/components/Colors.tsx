@@ -3,12 +3,10 @@ import type { BaseHexColor } from '../hex'
 export function Palette({
 	colorsPalette,
 	position,
-	width,
 	count,
 }: {
 	colorsPalette: BaseHexColor[][]
 	position: number
-	width: number
 	count: number
 }) {
 	const colorsDisplay = []

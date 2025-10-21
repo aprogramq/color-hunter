@@ -50,5 +50,8 @@ export function useKeyboardState(state: any) {
 			state.setSelectedIndex(0)
 			state.setTimeout((to: NodeJS.Timeout) => to?.close() ?? null)
 		}
+		else if (key.name === 'o'){
+			
+		}
 	})
 } 

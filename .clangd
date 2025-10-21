@@ -3,5 +3,6 @@ CompileFlags:
     "-I/usr/include/freetype2",
     "-I/usr/include/cairo",
     "-lfreetype",
-    "-lcairo"
+    "-lcairo",
+	-DCLANGD_IGNORE_BIG_HEADER
   ]
