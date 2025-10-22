@@ -20,6 +20,7 @@
 #define PLACEHOLDER 2
 #define MAX_COUNT_PALETTE 1000
 #define DOUBLE_QUOUTE 34
+#define SAVE_PATH 1
 
 struct RGB {
     double r;
@@ -56,7 +57,6 @@ void save_palette(int count, char **hex, char **text_colors) {
         colors[i] = hexToRGB(hex[i]);
         text_rgb[i] = hexToRGB(text_colors[i]);
     }
-    // printf("\t%f, %f, %f\n", text_rgb[0].r, text_rgb[0].g, text_rgb[0].b);
 
     int x_position = 60;
 
@@ -86,16 +86,13 @@ void save_palette(int count, char **hex, char **text_colors) {
     free(path_to_palette);
 }
 
-char *get_setting_path();
+char **get_setting_path();
 char *path_to_save() {
-    char *path_to_palette = malloc(100000);
-	path_to_palette = get_setting_path();
-
-
-    DIR *palette_dir = opendir(path_to_palette);
+    char **settings = get_setting_path();
+    DIR *palette_dir = opendir(settings[SAVE_PATH]);
     if (palette_dir == NULL) {
-        mkdir(path_to_palette, 0700);
-        palette_dir = opendir(path_to_palette);
+        mkdir(settings[SAVE_PATH], 0700);
+        palette_dir = opendir(settings[SAVE_PATH]);
     }
     struct dirent *entry;
     int palette_number = 0;
@@ -106,15 +103,23 @@ char *path_to_save() {
     }
     sprintf(name, name, palette_number);
 
-    char *file_name = (char *)calloc(1, (strlen("palette_%d.svg\n") + MAX_COUNT_PALETTE));
+    char *file_name = (char *)calloc(1, (strlen("palette_%d.svg") + MAX_COUNT_PALETTE));
 
     if (palette_number > 0) {
         strcpy(file_name, name);
     } else {
         strcpy(file_name, "palette.svg");
     }
-    strcat(path_to_palette, file_name);
-    return path_to_palette;
+    settings[SAVE_PATH] = realloc(settings[SAVE_PATH], strlen(settings[SAVE_PATH]) + strlen(file_name) + 1);
+    strcat(settings[SAVE_PATH], file_name);
+
+    char *save_path = malloc(strlen(settings[SAVE_PATH]) + 1);
+    strcpy(save_path, settings[SAVE_PATH]);
+
+    free(settings);
+    free(file_name);
+    closedir(palette_dir);
+    return save_path;
 }
 
 struct RGB hexToRGB(const char *hex) {
@@ -138,24 +143,29 @@ int hex_to_int(const char *hex) {
     sscanf(hex, "%2x", &value);
     return value;
 }
-char *get_setting_path() {
-    char *line = malloc(10000 * sizeof(char));
+char **get_setting_path() {
+    char line[1000];
+    char buff[1000];
+    bzero(buff, 1000);
+
     FILE *settings_ptr = fopen("/home/aprogramb/.config/color-hunter/settings.json", "r");
-    char *buff = malloc(10000);
-    char **parametrs = malloc(1000 * sizeof(char *));
+
+    char **parametrs = malloc(2 * sizeof(char *));
     int parametrs_step = 0;
+
     int step = 0;
+    bool in_double_quote = false;
+
     while (fgets(line, 100, settings_ptr)) {
-        bool in_double_quote = false;
         if (strcmp(line, "{\n") != 0 && strcmp(line, "}\n") != 0)
-            for (int i = 0; line[i] != EOF; i++) {
+            for (int i = 0; line[i] != '\0'; i++) {
                 if (line[i] == DOUBLE_QUOUTE) {
                     in_double_quote = !in_double_quote;
                     i++;
                     if (in_double_quote == false) {
-                        parametrs[parametrs_step] = malloc(1000 * sizeof(char));
+                        parametrs[parametrs_step] = malloc(strlen(buff) + 1);
                         strcpy(parametrs[parametrs_step++], buff);
-                        bzero(buff, strlen(buff));
+                        bzero(buff, 1000);
                         step = 0;
                     }
                 }
@@ -163,7 +173,6 @@ char *get_setting_path() {
                     buff[step++] = line[i];
             }
     }
-    free(buff);
-    free(line);
-    return parametrs[1];
+    fclose(settings_ptr);
+    return parametrs;
 }
