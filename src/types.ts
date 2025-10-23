@@ -15,9 +15,11 @@ export type HexValue = string;
 export type OptionValue = string | "default" | "cold" | "warm" | "pastel"
 
 export const options = [
-	{ name: 'Default', description: '', value: 'default' },
-	{ name: 'Cold color', description: '', value: 'cold' },
-	{ name: 'Warm color', description: '', value: 'warm' },
-	{ name: 'Pastel color', description: '', value: 'pastel' },
+	{ name: 'default', description: '', value: 'default' },
+	{ name: 'cold color', description: '', value: 'cold' },
+	{ name: 'warm color', description: '', value: 'warm' },
+	{ name: 'pastel color', description: '', value: 'pastel' },
 ]
-export type sizeT = {height:number, width:number}
+export interface sizeT { height: number, width: number }
+export type displayT = "start" | "options"
+export type optionsT = [{ name: string, description: string, value: string }]

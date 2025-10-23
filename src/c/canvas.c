@@ -20,7 +20,7 @@
 #define PLACEHOLDER 2
 #define MAX_COUNT_PALETTE 1000
 #define DOUBLE_QUOUTE 34
-#define SAVE_PATH 1
+#define SAVE_PATH 0
 
 struct RGB {
     double r;

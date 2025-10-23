@@ -1,43 +1,35 @@
 import { render, useKeyboard, useRenderer } from '@opentui/react'
 import { createContext, useEffect, useState } from 'react'
-import { Palette } from './components/Colors'
-import { options, type sizeT } from './types'
+import { Palette } from './components/start/Colors'
+import { type displayT, options, type sizeT } from './types'
 import type { BaseHexColor } from './hex'
-import { useKeyboardState } from './keyboard'
-import { StartScreen } from './components/Start'
+import { useKeyboardStart } from './keyboard'
+import { StartScreen } from './components/start/Start'
 import { Options } from './components/Options'
 import { initialize } from './init'
 
-export const SizeContext = createContext<sizeT>({height:0, width:0})
+export const SizeContext = createContext<sizeT>({ height: 0, width: 0 })
 
 function App() {
-	const [diplsayStartScreen, setDisplayStartScreen] = useState<boolean>(true)
-	const [displayOptions, setDisplayOptions] = useState<boolean>(false)
+	initialize()
+	const [display, setDisplay] = useState<displayT>('start')
 	const render = useRenderer()
 	// useEffect(()=>{
 	// 	render.console.show()
 	// })
-
-	const height: number = render.height
-	const width: number = render.width
-	const size = {height: render.height, width: render.width}
-
-	initialize()
+	const size = { height: render.height, width: render.width }
 
 	const enterOptions = () => {
-		setDisplayOptions(true)
-		setDisplayStartScreen(false)
+		setDisplay('options')
 	}
 	const exitOptions = () => {
-		setDisplayOptions(false)
-		setDisplayStartScreen(true)
+		setDisplay('start')
 	}
 	return (
 		<>
 			<SizeContext value={size}>
-				{diplsayStartScreen && <StartScreen enterOptions={enterOptions} />}
-				{displayOptions && <Options exitOptions={exitOptions} />}
-				{/* <Options/> */}
+				<StartScreen enterOptions={enterOptions} isActive={display === 'start'} />
+				<Options exitOptions={exitOptions} isActive={display === 'options'} />
 			</SizeContext>
 		</>
 	)

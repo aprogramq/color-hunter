@@ -1,7 +1,7 @@
 import { useContext } from 'react'
-import type { BaseHexColor } from '../hex'
-import type { sizeT } from '../types'
-import { SizeContext } from '..'
+import type { BaseHexColor } from '../../hex'
+import type { sizeT } from '../../types'
+import { SizeContext } from '../../index.tsx'
 
 export function Palette({
 	colorsPalette,
@@ -25,17 +25,18 @@ export function Palette({
 				width="10%"
 				height="60%"
 			>
-				<text justifyContent="center" alignItems='center' fg={colorsPalette[position]![i]?.textColor}>
+				<text justifyContent="center" alignItems="center" fg={colorsPalette[position]![i]?.textColor}>
 					{colorsPalette[position]![i] && colorsPalette[position]![i]!.get()}
 				</text>
 			</box>
 		)
 	}
-	return (
-		<>
-			<box flexDirection="row" height={10} width={160} justifyContent="center" alignItems="center">
-				{colorsDisplay}
-			</box>
-		</>
-	)
+	if (colorsPalette)
+		return (
+			<>
+				<box flexDirection="row" height={10} width={160} justifyContent="center" alignItems="center">
+					{colorsDisplay}
+				</box>
+			</>
+		)
 }
