@@ -3,16 +3,17 @@ import { useKeyboard } from '@opentui/react'
 import { useEffect, useState } from 'react'
 import { Buffer } from 'node:buffer'
 import fs from 'fs'
+import { ModalSuccess } from './modals/ModalSuccess'
 
-export function Options({ exitOption }) {
-	const [pathInput, setPathInput] = useState<string>('')
+export function Options({ exitOptions }: { exitOptions: () => void }) {
 	const [positionFocusedInput, setPositionFocusedInput] = useState<number>(1)
 	const [selectionMode, setSelectionMode] = useState<boolean>(true)
 	const [displaySaveMessage, setDisplaySaveMessage] = useState<boolean>(false)
 
 	const pathToSettingFile = '/home/aprogramb/.config/color-hunter/settings.json'
-	const file = fs.readFileSync(pathToSettingFile)
-	const jsonFile = JSON.parse(file.toString())
+	const jsonFile = JSON.parse( ( fs.readFileSync(pathToSettingFile) ).toString() )
+
+	const [pathInput, setPathInput] = useState<string>(jsonFile['savePath'])
 
 	useKeyboard((key) => {
 		if (key.name === 'j' && selectionMode) setPositionFocusedInput((pos) => pos + 1)
@@ -24,7 +25,9 @@ export function Options({ exitOption }) {
 			console.log(pathInput)
 			fs.writeFileSync(pathToSettingFile, JSON.stringify(jsonFile, null, 4))
 			setDisplaySaveMessage(true)
-		} else if (key.name === 'e' && selectionMode) exitOption()
+			setTimeout(() => setDisplaySaveMessage(false), 2000)
+			setSelectionMode(true)
+		} else if (key.name === 'e' && selectionMode) exitOptions()
 	})
 	return (
 		<>
@@ -33,20 +36,24 @@ export function Options({ exitOption }) {
 					<ascii-font font="tiny" text="Options" fg={hexToRgb('#7c86ff')} />
 					<box title="Path to Save" width={50} marginTop={1} borderStyle="single">
 						<input
+							focusedBackgroundColor="#222222"
 							value={jsonFile['savePath']}
 							onInput={(val) => setPathInput(val)}
-							backgroundColor={positionFocusedInput === 1 ? '#333333' : '#000000'}
+							backgroundColor={positionFocusedInput === 1 ? '#111111' : '#000000'}
 							padding={1}
 							focused={positionFocusedInput === 1 && !selectionMode}
-							textColor="#4f46e5"
+							textColor={selectionMode ? '#4f46e5' : '#000000'}
 						/>
 					</box>
 				</box>
-				{displaySaveMessage && (
-					<box backgroundColor={'#05df72'} position="absolute" right={0} width={20} height={2}>
-						<text fg={'#0d542b'}>Successfully</text>
-					</box>
-				)}
+				{displaySaveMessage && <ModalSuccess/>}
+			</box>
+			<box padding={1}>
+				<box top={25} left={5} position="absolute" width={50}>
+					<text fg="#ffffff" style={{ marginBottom: 1 }}>
+						{selectionMode ? '[E]xit' : '[Esc] to selection mode'}
+					</text>
+				</box>
 			</box>
 		</>
 	)

@@ -1,6 +1,7 @@
 import { useKeyboard } from "@opentui/react"
 import { randomColor, savePaletteWrapedC } from "./fuctions"
 import { options } from "./types"
+import { stat } from "node:fs"
 
 export function useKeyboardState(state: any) {
 	useKeyboard((key) => {
@@ -20,7 +21,10 @@ export function useKeyboardState(state: any) {
 				state.setDisplayColors(true)
 				state.setPause(false)
 			} else if (state.displayColors) {
-				savePaletteWrapedC(state.colorsPalette[state.position]!, state.countColorsPalette)
+				if (savePaletteWrapedC(state.colorsPalette[state.position]!, state.countColorsPalette)) {
+					state.setDisplaySaveMessage(true);
+					setTimeout(() => state.setDisplaySaveMessage(false), 2000)
+				}
 				state.setDisplayColors(true)
 			}
 		} else if (key.name === 'c' && state.displayColors && state.pause) {
@@ -50,8 +54,9 @@ export function useKeyboardState(state: any) {
 			state.setSelectedIndex(0)
 			state.setTimeout((to: NodeJS.Timeout) => to?.close() ?? null)
 		}
-		else if (key.name === 'o'){
-			
-		}
-	})
-} 
+		else if (key.name == 'o' && !state.displayColors)
+			state.enterOptions()
+	}
+
+	)
+}

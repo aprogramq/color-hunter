@@ -1,4 +1,4 @@
-#include "./iosevka_data.h"
+#include "./iosevka_font.h"
 #include <cairo/cairo-ft.h>
 #include <cairo/cairo-svg.h>
 #include <cairo/cairo.h>
@@ -39,6 +39,7 @@ int main() {
     char *color_palette[3] = {"111111", "222222", "333333"};
     char *text_color[3] = {"ffffff", "ffffff", "ffffff"};
     save_palette(3, color_palette, text_color);
+	return 1;
 }
 
 void save_palette(int count, char **hex, char **text_colors) {

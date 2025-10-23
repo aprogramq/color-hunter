@@ -5,26 +5,26 @@ import type { OptionValue } from "./types";
 import { canvasSo } from "./c/canvas.ts";
 import fs from "fs"
 
-export const {
-	symbols: { save_palette },
-} = cc({
-	source: "/home/aprogramb/projects/javascript/color-hunter/src/c/canvas.c",
-	library: "cairo",
-	include: ["/usr/include/cairo", "/usr/include/libpng16", "/usr/include/freetype2", "/usr/include/pixman-1"],
-	symbols: {
-		save_palette: {
-			returns: "void", args: ["int", "pointer", "pointer"],
-		},
-	},
-})
-// const libData = Buffer.from(canvasSo, "base64");
-// fs.writeFileSync("/tmp/canvas_lib.so", libData, { encoding: "binary" })
-// const cLib = dlopen("/tmp/canvas_lib.so", {
-// 	save_palette: {
-// 		returns: "void", args: ["int", "pointer", "pointer"],
+// export const {
+// 	symbols: { save_palette },
+// } = cc({
+// 	source: "/home/aprogramb/projects/javascript/color-hunter/src/c/canvas.c",
+// 	library: "cairo",
+// 	include: ["/usr/include/cairo", "/usr/include/libpng16", "/usr/include/freetype2", "/usr/include/pixman-1"],
+// 	symbols: {
+// 		save_palette: {
+// 			returns: "int", args: ["int", "pointer", "pointer"],
+// 		},
 // 	},
-//
 // })
+const libData = Buffer.from(canvasSo, "base64");
+fs.writeFileSync("/tmp/canvas_lib.so", libData, { encoding: "binary" })
+const cLib = dlopen("/tmp/canvas_lib.so", {
+	save_palette: {
+		returns: "int", args: ["int", "pointer", "pointer"],
+	},
+
+})
 
 type UseState<T> = Dispatch<SetStateAction<T>>;
 
@@ -64,7 +64,7 @@ export function randomColor(count: number, setColorsPalette: UseState<BaseHexCol
 	return colorInterval;
 }
 
-export function savePaletteWrapedC(palette: BaseHexColor[], countColorsPalette: number) {
+export function savePaletteWrapedC(palette: BaseHexColor[], countColorsPalette: number): number {
 
 	const paletteHex: ArrayLike<string>[] = []
 	palette.forEach((hex) => paletteHex.push(hex.get().replace('#', '')))
@@ -85,5 +85,5 @@ export function savePaletteWrapedC(palette: BaseHexColor[], countColorsPalette: 
 	const textColorPtr = ptr(new BigUint64Array(pointerTextColors.map(p => (BigInt(p)))))
 
 
-	save_palette(countColorsPalette, palettePtr, textColorPtr)
+	return cLib.symbols.save_palette(countColorsPalette, palettePtr, textColorPtr)
 }

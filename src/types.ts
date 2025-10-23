@@ -20,3 +20,4 @@ export const options = [
 	{ name: 'Warm color', description: '', value: 'warm' },
 	{ name: 'Pastel color', description: '', value: 'pastel' },
 ]
+export type sizeT = {height:number, width:number}
