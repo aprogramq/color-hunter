@@ -1,9 +1,7 @@
 <p align="center">
-  <a href="https://opencode.ai">
     <picture>
-      <img src="./color_hunter_logo.png" alt="Color Hunter logo">
+      <img src="./example1.png" alt="Color Hunter logo">
     </picture>
-  </a>
 </p>
 <p align="center">Helper for searching individual colors</p>
 <p align="center">

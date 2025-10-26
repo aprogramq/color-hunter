@@ -57,18 +57,18 @@ export function StartScreen({ enterOptions, isActive }: { enterOptions: () => vo
 						<>
 							<text
 								fg="#ffffff"
-								position="static"
+								position="absolute"
 								right={size.width / 1.4}
-								top={size.height / 2.1}
+								top={size.height / 1.9}
 							>{`${position === 1 ? '' : '<-- [B]ack'}`}</text>
 							<text
 								fg="#ffffff"
-								position="static"
+								position="absolute"
 								left={size.width / 1.4}
-								top={size.height / 2.1}
+								top={size.height / 1.9}
 							>{`${position === colorsPalette.length - 1 ? '' : '[N]ext -->'}`}</text>
 
-							<box flexDirection="row" position='absolute' top={size.height / 1.8}>
+							<box flexDirection="row" position='absolute' top={size.height / 1.6}>
 								<box  padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
 									<text fg="#ffffff">[C]ontinue</text>
 								</box>
@@ -80,7 +80,7 @@ export function StartScreen({ enterOptions, isActive }: { enterOptions: () => vo
 					)}
 					{!pause && displayColors && (
 							<>
-								<text fg="#ffffff" position="static">
+								<text fg="#ffffff" position="absolute" top={size.height / 1.5}>
 									Press [space] to stop
 								</text>
 							</>
