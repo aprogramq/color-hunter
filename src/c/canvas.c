@@ -20,7 +20,7 @@
 #define PLACEHOLDER 2
 #define MAX_COUNT_PALETTE 1000
 #define DOUBLE_QUOUTE 34
-#define SAVE_PATH 0
+#define SAVE_PATH 1
 
 struct RGB {
     double r;
@@ -39,14 +39,14 @@ int main() {
     char *color_palette[3] = {"111111", "222222", "333333"};
     char *text_color[3] = {"ffffff", "ffffff", "ffffff"};
     save_palette(3, color_palette, text_color);
-	return 1;
+    return 1;
 }
 
 void save_palette(int count, char **hex, char **text_colors) {
     FT_Library library;
     FT_Face face;
     FT_Init_FreeType(&library);
-    FT_New_Memory_Face(library, IosevkaSS01_Medium_ttf, IosevkaSS01_Medium_ttf_len, 0, &face);
+    FT_New_Memory_Face(library, iosevka_font, iosevka_font_len, 0, &face);
 
     char *path_to_palette = path_to_save();
     cairo_surface_t *surface = cairo_svg_surface_create(path_to_palette, 500, 500);

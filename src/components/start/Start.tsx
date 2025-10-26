@@ -37,7 +37,6 @@ export function StartScreen({ enterOptions, isActive }: { enterOptions: () => vo
 		setDisplayModal,
 	}
 	const displayLogo = size.height > 13 || !displayColors
-	console.log(size.height)
 
 	useKeyboardStart(states)
 
@@ -58,31 +57,33 @@ export function StartScreen({ enterOptions, isActive }: { enterOptions: () => vo
 						<>
 							<text
 								fg="#ffffff"
-								position="absolute"
+								position="static"
 								right={size.width / 1.4}
 								top={size.height / 2.1}
 							>{`${position === 1 ? '' : '<-- [B]ack'}`}</text>
 							<text
 								fg="#ffffff"
-								position="absolute"
+								position="static"
 								left={size.width / 1.4}
 								top={size.height / 2.1}
 							>{`${position === colorsPalette.length - 1 ? '' : '[N]ext -->'}`}</text>
 
-							<box flexDirection="row">
-								<box backgroundColor="#000000" padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
+							<box flexDirection="row" position='absolute' top={size.height / 1.8}>
+								<box  padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
 									<text fg="#ffffff">[C]ontinue</text>
 								</box>
-								<box backgroundColor="#000000" padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
+								<box  padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
 									<text fg="#ffffff">[S]ave palette</text>
 								</box>
 							</box>
 						</>
 					)}
 					{!pause && displayColors && (
-						<box backgroundColor="#000000" padding={1} paddingLeft={4} paddingRight={4} marginTop={1}>
-							<text fg="#ffffff">Press [space] to stop</text>
-						</box>
+							<>
+								<text fg="#ffffff" position="static">
+									Press [space] to stop
+								</text>
+							</>
 					)}
 				</box>
 				<box padding={1}>

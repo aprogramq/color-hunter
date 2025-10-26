@@ -1,5 +1,5 @@
 import { useKeyboard } from "@opentui/react"
-import { randomColor, savePaletteWrapedC } from "./fuctions"
+import { randomColor, savePaletteWrapedC } from "./fuctions.ts"
 import { options } from "./types"
 import { useState } from "react"
 

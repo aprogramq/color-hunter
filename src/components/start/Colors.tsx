@@ -14,6 +14,7 @@ export function Palette({
 }) {
 	const colorsDisplay = []
 	const size = useContext<sizeT>(SizeContext)
+	console.log(`Height: ${size.height}, Width: ${size.width}`)
 
 	for (let i = 0; i < count; i++) {
 		colorsDisplay.push(
@@ -23,7 +24,7 @@ export function Palette({
 				alignItems="center"
 				backgroundColor={colorsPalette[position]![i]?.get()}
 				width="10%"
-				height="60%"
+				height={ size.height > 9? "60%": "100%" }
 			>
 				<text justifyContent="center" alignItems="center" fg={colorsPalette[position]![i]?.textColor}>
 					{colorsPalette[position]![i] && colorsPalette[position]![i]!.get()}

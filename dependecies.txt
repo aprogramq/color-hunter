@@ -1,2 +1,2 @@
-sudo apt-get install libcairo2-dev libfreetype-dev
+sudo apt-get install libcairo2-dev libfreetype-dev clang
 
