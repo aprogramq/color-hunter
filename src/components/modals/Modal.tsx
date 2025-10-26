@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 export function Modal({ activate }: { activate: boolean }) {
 	if (activate)
 		return (

@@ -1,7 +1,6 @@
 import { useKeyboard } from "@opentui/react"
 import { randomColor, savePaletteWrapedC } from "./fuctions"
 import { options } from "./types"
-import { stat } from "node:fs"
 import { useState } from "react"
 
 export function useKeyboardStart(state: any) {

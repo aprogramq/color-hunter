@@ -1,5 +1,5 @@
 import { type Dispatch, type SetStateAction } from "react";
-import { cc, dlopen, ptr } from "bun:ffi"
+import { dlopen, ptr } from "bun:ffi"
 import { BaseHexColor, HexColor, HexColorCold, HexColorPastele, HexColorWarm } from "./hex";
 import type { OptionValue } from "./types";
 import { canvasSo } from "./c/canvas.ts";

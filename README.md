@@ -1,15 +1,29 @@
-# react
+<p align="center">
+  <a href="https://opencode.ai">
+    <picture>
+      <img src="./color_hunter_logo.png" alt="Color Hunter logo">
+    </picture>
+  </a>
+</p>
+<p align="center">Helper for searching individual colors</p>
+<p align="center">
+</p>
 
-To install dependencies:
+### Idea
+
+The idea came after visiting the site with the palettes and I thought that there were so many familiar color palettes that I decided to create a tool that will give much more individual colors
+
+### Installation
+Check the realese page
+
+or
+
+Build from source code
 
 ```bash
-bun install
+bun build ./src/index.tsx --compile --outfile color-hunter 
 ```
 
-To run:
+### Contributing
 
-```bash
-bun run src/index.tsx
-```
-
-This project was created using `bun init` in bun v1.2.20. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Welcome your any comments about my code and also help

@@ -1,4 +1,4 @@
-import {type optionsT, type sizeT, options } from "../../types"
+import { type sizeT, options } from "../../types"
 
 export function SelectMode({height, setIndex}:{height:sizeT["height"], setIndex:(i:number)=>void}) {
 	return (

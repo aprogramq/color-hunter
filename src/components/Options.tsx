@@ -1,7 +1,6 @@
-import { hexToRgb, KeyHandler, RGBA, TextAttributes } from '@opentui/core'
+import { hexToRgb } from '@opentui/core'
 import { useKeyboard } from '@opentui/react'
-import { useEffect, useState } from 'react'
-import { Buffer } from 'node:buffer'
+import { useState } from 'react'
 import fs from 'fs'
 import { Modal } from './modals/Modal'
 
@@ -47,7 +46,7 @@ export function Options({ exitOptions, isActive }: { exitOptions: () => void; is
 							/>
 						</box>
 					</box>
-					<Modal activate={displayModalMessage}/>
+					<Modal activate={displayModalMessage} />
 				</box>
 				<box padding={1}>
 					<box top={25} left={5} position="absolute" width={50}>
