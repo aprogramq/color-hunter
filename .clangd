@@ -1,0 +1,8 @@
+CompileFlags:
+  Add: [
+    "-I/usr/include/freetype2",
+    "-I/usr/include/cairo",
+    "-lfreetype",
+    "-lcairo",
+	-DCLANGD_IGNORE_BIG_HEADER
+  ]
