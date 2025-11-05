@@ -1,4 +1,5 @@
 import { type Dispatch, type SetStateAction } from 'react'
+import type { BaseHexColor } from './hex'
 export interface ControlWheelProp {
   pause: boolean
   timeout: NodeJS.Timeout | null
@@ -25,6 +26,7 @@ export interface sizeT {
   height: number
   width: number
 }
-export type displayT = 'start' | 'options'
+export type displayT = 'start' | 'options' | 'main'
 export type optionsT = [{ name: string; description: string; value: string }]
 export type UseState<T> = Dispatch<SetStateAction<T>>
+export type paletteT = {colors: BaseHexColor[][], size:number, display:boolean, position:number}

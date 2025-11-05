@@ -1,61 +1,79 @@
 import { useKeyboard } from '@opentui/react'
 import { randomColor, savePaletteWrapedC } from './fuctions.ts'
-import { options } from './types'
-import { useState } from 'react'
+import { options, type displayT, type optionsT, type paletteT, type UseState } from './types'
+import { useEffect, useState } from 'react'
+import type { DiagnosticMessageChain } from 'typescript'
 
-export function useKeyboardStart(state: any) {
-  const [timeout, setMyTimeout] = useState<NodeJS.Timeout>()
-  useKeyboard((key) => {
-    if (key.name === 'space') {
-      state.setPause(true)
-      setMyTimeout((to: NodeJS.Timeout) => to?.close() ?? null)
+export function useKeyboardMain(state: {palette: paletteT, setPalette: UseState<paletteT>, selectedIndex: number, setSelectedIndex: UseState<number>, pause: boolean, setPause: UseState<boolean>, actionOptions: (option: displayT) => void, setDisplayModal: UseState<boolean>, timeout:any, setMyTimeout:UseState<NodeJS.Timeout> }) {
 
-    } else if (key.name === 's') {
-      if (!state.displayColors) {
-        setMyTimeout(
-          randomColor(
-            state.sizeColorsPalette,
-            state.setColorsPalette,
-            state.setPosition,
-            options[state.selectedIndex]!.value
-          )
-        )
-        state.setDisplayColors(true)
-        state.setPause(false)
+	useKeyboard((key) => {
+		switch (key.name) {
+			case "space":
+				state.setPause(true)
+				state.setMyTimeout((to: NodeJS.Timeout) => to?.close() ?? null)
+				break;
+			case "s":
+				if (savePaletteWrapedC(state.palette.colors[state.palette.position]!, state.palette.size)) {
+					state.setDisplayModal(true)
+					setTimeout(() => state.setDisplayModal(false), 2000)
+				}
+				state.setPalette((p) => ({ ...p, display: true }))
 
-      } else if (state.displayColors) {
-        if (savePaletteWrapedC(state.colorsPalette[state.position]!, state.sizeColorsPalette)) {
-          state.setDisplayModal(true)
-          setTimeout(() => state.setDisplayModal(false), 2000)
-        }
-        state.setDisplayColors(true)
-      }
-    } else if (key.name === 'c' && state.displayColors && state.pause) {
-      setMyTimeout(
-        randomColor(
-          state.sizeColorsPalette,
-          state.setColorsPalette,
-          state.setPosition,
-          options[state.selectedIndex]!.value
-        )
-      )
-      state.setPosition(state.colorsPalette.length - 1)
-      state.setDisplayColors(true)
-      state.setPause(false)
+				break;
+			case "c":
+				if (state.palette.display && state.pause) {
+					state.setMyTimeout(
+						randomColor(
+							state.palette,
+							state.setPalette,
+							options[state.selectedIndex]!.value
+						)
+					)
 
-    } else if (key.name === 'b' && state.pause && state.position > 1) {
-      state.setPosition((pos: number) => pos - 1)
+					state.setPalette((p) => ({ ...p, position: p.colors.length - 1 }))
+					state.setPalette((p) => ({ ...p, display: true }))
+					state.setPause(false)
+				}
+				break;
+			case "b":
+				if (state.pause && state.palette.position > 1)
+					state.setPalette((p) => ({ ...p, position: p.position - 1 }))
+				break;
+			case "n":
+				if (state.pause && state.palette.position < state.palette.colors.length - 1)
+					state.setPalette((p) => ({ ...p, position: p.position + 1 }))
+				break;
+			case "e":
+					state.setPalette((p) => ({ ...p, position: 0, colors: [[]], display: false }))
+					state.setSelectedIndex(0)
+					state.setMyTimeout((to: NodeJS.Timeout) => to?.close() ?? null)
+					state.actionOptions("start")
+				break;
+			case "o":
+				if (!state.palette.display)
+					state.actionOptions("options")
+				break;
+		}
+	})
+}
 
-    } else if (key.name === 'n' && state.pause && state.position < state.colorsPalette.length - 1) {
-      state.setPosition((pos: number) => pos + 1)
+export function useKeyboardStart(actionOptions: (option: displayT) => void) {
 
-    } else if (key.name === 'e' && state.displayColors) {
-      state.setPosition(0)
-      state.setColorsPalette([[]])
-      state.setDisplayColors(false)
-      state.setSelectedIndex(0)
-      setMyTimeout((to: NodeJS.Timeout) => to?.close() ?? null)
+	useKeyboard((key) => {
+		if (key.name === "s")
+			actionOptions("main")
+		if (key.name === "o")
+			actionOptions("options")
+	})
+}
 
-    } else if (key.name == 'o' && !state.displayColors) state.enterOptions()
-  })
+export function useKeyboardOptions(selectionMode, setSelectionMode, setPositionFocusedInput, saveNewPathSave, actionOptions) {
+	useKeyboard((key) => {
+		if (key.name === 'j' && selectionMode) setPositionFocusedInput((pos) => pos + 1)
+		else if (key.name === 'k' && selectionMode) setPositionFocusedInput((pos) => (pos > 1 ? pos - 1 : pos))
+		else if (key.name === 'escape') setSelectionMode(true)
+		else if (key.name === 'return' && selectionMode) setSelectionMode(false)
+		else if (key.name === 'return' && !selectionMode) saveNewPathSave()
+		else if (key.name === 'e' && selectionMode) actionOptions("start")
+	})
 }
