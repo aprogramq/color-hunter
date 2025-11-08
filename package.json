@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.80",
-    "@opentui/core": "^0.1.25",
+    "@opentui/core": "^0.1.36",
     "@opentui/react": "^0.1.25",
     "react": "^19.2.0"
   }

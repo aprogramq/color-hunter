@@ -4,13 +4,13 @@ import { options, type displayT, type optionsT, type paletteT, type UseState } f
 import { useEffect, useState } from 'react'
 import type { DiagnosticMessageChain } from 'typescript'
 
-export function useKeyboardMain(state: {palette: paletteT, setPalette: UseState<paletteT>, selectedIndex: number, setSelectedIndex: UseState<number>, pause: boolean, setPause: UseState<boolean>, actionOptions: (option: displayT) => void, setDisplayModal: UseState<boolean>, timeout:any, setMyTimeout:UseState<NodeJS.Timeout> }) {
+export function useKeyboardMain(state: { palette: paletteT, setPalette: UseState<paletteT>, selectedIndex: number, setSelectedIndex: UseState<number>, pause: boolean, setPause: UseState<boolean>, actionOptions: (option: displayT) => void, setDisplayModal: UseState<boolean>, timeout: NodeJS.Timeout, setMyTimeout: UseState<NodeJS.Timeout> }) {
 
 	useKeyboard((key) => {
 		switch (key.name) {
 			case "space":
 				state.setPause(true)
-				state.setMyTimeout((to: NodeJS.Timeout) => to?.close() ?? null)
+				clearTimeout(state.timeout)
 				break;
 			case "s":
 				if (savePaletteWrapedC(state.palette.colors[state.palette.position]!, state.palette.size)) {
@@ -30,8 +30,7 @@ export function useKeyboardMain(state: {palette: paletteT, setPalette: UseState<
 						)
 					)
 
-					state.setPalette((p) => ({ ...p, position: p.colors.length - 1 }))
-					state.setPalette((p) => ({ ...p, display: true }))
+					state.setPalette((p) => ({ ...p, position: p.colors.length - 1, display: true  }))
 					state.setPause(false)
 				}
 				break;
@@ -44,10 +43,10 @@ export function useKeyboardMain(state: {palette: paletteT, setPalette: UseState<
 					state.setPalette((p) => ({ ...p, position: p.position + 1 }))
 				break;
 			case "e":
-					state.setPalette((p) => ({ ...p, position: 0, colors: [[]], display: false }))
-					state.setSelectedIndex(0)
-					state.setMyTimeout((to: NodeJS.Timeout) => to?.close() ?? null)
-					state.actionOptions("start")
+				state.setPalette((p) => ({ ...p, position: 0, colors: [[]], display: false }))
+				state.setSelectedIndex(0)
+				clearTimeout(state.timeout)
+				state.actionOptions("start")
 				break;
 			case "o":
 				if (!state.palette.display)

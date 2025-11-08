@@ -1,10 +1,10 @@
 import { render, useKeyboard, useRenderer } from '@opentui/react'
 import { createContext, useEffect, useState } from 'react'
 import { type displayT, type sizeT } from './types'
-import { StartScreen } from './components/Start'
-import { Options } from './components/Options'
+import { StartScreen } from './components/screens/Start'
+import { Options } from './components/screens/Options'
 import { initialize } from './init'
-import Main from './components/Main'
+import Main from './components/screens/Main'
 import { useKeyboardStart } from './keyboard'
 
 export const SizeContext = createContext<sizeT>({ height: 0, width: 0 })
@@ -15,9 +15,9 @@ function App() {
   const render = useRenderer()
   const size = { height: render.height, width: render.width }
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
-  useEffect(() => {
-    render.console.show()
-  })
+  // useEffect(() => {
+  //   render.console.show()
+  // })
 
   const actionOptions = (display: displayT) => {
     switch (display) {

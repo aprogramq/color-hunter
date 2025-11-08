@@ -2,11 +2,12 @@ import { hexToRgb } from '@opentui/core'
 import { useKeyboard } from '@opentui/react'
 import { useContext, useState } from 'react'
 import fs from 'fs'
-import { Modal } from './Modal'
-import { SizeContext } from '..'
-import type { displayT, sizeT } from '../types'
+import { Modal } from '../Modal'
+import { SizeContext } from '../..'
+import type { displayT, sizeT } from '../../types'
 import os from 'os'
-import { useKeyboardOptions } from '../keyboard'
+import { useKeyboardOptions } from '../../keyboard'
+import { Hint } from '../Hints'
 
 export function Options({ actionOptions }: { actionOptions: (display: displayT) => void }) {
   const [positionFocusedInput, setPositionFocusedInput] = useState<number>(1)
@@ -48,14 +49,8 @@ export function Options({ actionOptions }: { actionOptions: (display: displayT) 
         </box>
         {/* <Modal activate={displayModalMessage} /> */}
       </box>
-      <box padding={1}>
-        <box top={size.height - 2} left={5} position="absolute" width={20}>
-          <text fg="#ffffff" style={{ marginBottom: 1 }}>
-            {selectionMode ? '[E]xit' : '[Esc] to selection mode'}
-          </text>
-        </box>
-        <Modal activate={displayModalMessage}/>
-      </box>
+      <Hint text={selectionMode ? '[E]xit' : '[Esc] to selection mode'} />
+      <Modal activate={displayModalMessage} />
     </>
   )
 }
