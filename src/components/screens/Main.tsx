@@ -10,6 +10,8 @@ import { Header } from '../start/Header'
 import { ConsolePosition } from '@opentui/core'
 import { walkUpBindingElementsAndPatterns } from 'typescript'
 import { Hint } from '../Hints'
+import os from 'os'
+import fs from 'fs'
 
 export default function Main({
   actionOptions,
@@ -20,9 +22,13 @@ export default function Main({
   selectedIndex: number
   setSelectedIndex: UseState<number>
 }) {
+  const settings = JSON.parse(
+    fs.readFileSync(`/home/${os.userInfo().username}/.config/color-hunter/settings.json`).toString()
+  )
+
   const [palette, setPalette] = useState<paletteT>({
     colors: [[]] as BaseHexColor[][],
-    size: 3,
+    size: settings['sizePalette'] > 10? 10: settings['sizePalette'],
     display: false,
     position: 0,
   })

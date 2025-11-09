@@ -42,7 +42,7 @@ int save_palette(int count, char **hex, char **text_colors) {
     FT_New_Memory_Face(library, iosevka_font, iosevka_font_len, 0, &face);
 
     char *path_to_palette = path_to_save();
-    cairo_surface_t *surface = cairo_svg_surface_create(path_to_palette, 500, 500);
+    cairo_surface_t *surface = cairo_svg_surface_create(path_to_palette,170 * count, 500);
     cairo_t *cr = cairo_create(surface);
 
     struct RGB colors[count];
@@ -58,18 +58,14 @@ int save_palette(int count, char **hex, char **text_colors) {
         char *hex_color = (char *)calloc(8, sizeof(char));
         *hex_color = '#';
         cairo_set_source_rgb(cr, colors[i].r / 255.0f, colors[i].g / 255.0f, colors[i].b / 255.0f);
-        cairo_rectangle(cr, 169 * i, 150, 170, 200);
+        cairo_rectangle(cr, 170 * i, 150, 170, 200);
         cairo_fill(cr);
 
         cairo_font_face_t *font = cairo_ft_font_face_create_for_ft_face(face, 0);
         cairo_set_font_face(cr, font);
         cairo_set_font_size(cr, 14.0f);
         cairo_set_source_rgb(cr, text_rgb[i].r / 255.0f, text_rgb[i].g / 255.0f, text_rgb[i].b / 255.0f);
-        cairo_move_to(cr, (i + 1) * x_position, 250);
-        if (i < 1)
-            x_position += 53;
-        else
-            x_position += 19;
+        cairo_move_to(cr,  ( 170 * i ) + 55 , 250);
 
         cairo_show_text(cr, strcat(hex_color, hex[i]));
         free(hex_color);

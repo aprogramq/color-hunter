@@ -15,6 +15,7 @@ function App() {
   const render = useRenderer()
   const size = { height: render.height, width: render.width }
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
+
   // useEffect(() => {
   //   render.console.show()
   // })

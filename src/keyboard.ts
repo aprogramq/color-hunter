@@ -3,6 +3,7 @@ import { randomColor, savePaletteWrapedC } from './fuctions.ts'
 import { options, type displayT, type optionsT, type paletteT, type UseState } from './types'
 import { useEffect, useState } from 'react'
 import type { DiagnosticMessageChain } from 'typescript'
+import { ConsolePosition } from '@opentui/core'
 
 export function useKeyboardMain(state: { palette: paletteT, setPalette: UseState<paletteT>, selectedIndex: number, setSelectedIndex: UseState<number>, pause: boolean, setPause: UseState<boolean>, actionOptions: (option: displayT) => void, setDisplayModal: UseState<boolean>, timeout: NodeJS.Timeout, setMyTimeout: UseState<NodeJS.Timeout> }) {
 
@@ -66,13 +67,13 @@ export function useKeyboardStart(actionOptions: (option: displayT) => void) {
 	})
 }
 
-export function useKeyboardOptions(selectionMode, setSelectionMode, setPositionFocusedInput, saveNewPathSave, actionOptions) {
+export function useKeyboardOptions(selectionMode, setSelectionMode, setPositionFocusedInput, saveNewOptions, actionOptions) {
 	useKeyboard((key) => {
-		if (key.name === 'j' && selectionMode) setPositionFocusedInput((pos) => pos + 1)
-		else if (key.name === 'k' && selectionMode) setPositionFocusedInput((pos) => (pos > 1 ? pos - 1 : pos))
+		if (key.name === 'j' || key.name === 'down' && selectionMode) setPositionFocusedInput((pos) => pos > 1? 1:pos+1)
+		else if (key.name === 'k' || key.name === 'up' && selectionMode) setPositionFocusedInput((pos) => (pos > 1 ? pos - 1 : pos))
 		else if (key.name === 'escape') setSelectionMode(true)
 		else if (key.name === 'return' && selectionMode) setSelectionMode(false)
-		else if (key.name === 'return' && !selectionMode) saveNewPathSave()
+		else if (key.name === 'return' && !selectionMode) saveNewOptions()
 		else if (key.name === 'e' && selectionMode) actionOptions("start")
 	})
 }
