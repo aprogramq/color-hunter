@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { SizeContext } from '..'
 
-export function Hint({ text}:{text:string}) {
+export function Hint({ text }: { text: string }) {
   const size = useContext(SizeContext)
   return (
     <box padding={1}>

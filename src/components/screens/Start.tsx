@@ -25,7 +25,7 @@ export function StartScreen({
     <box alignItems="center" justifyContent="center" flexGrow={1} marginTop={1}>
       <Header activate={displayLogo} />
       <StartButton height={size.height} />
-      <SelectMode height={size.height} setIndex={setSelectedIndex} selctedIndex={-1} />
+      <SelectMode height={size.height} setIndex={setSelectedIndex} />
       <Hint text="[O]ptions" />
     </box>
   )

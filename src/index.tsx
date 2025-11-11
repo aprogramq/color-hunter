@@ -37,7 +37,9 @@ function App() {
     <>
       <SizeContext value={size}>
         {display === 'start' && <StartScreen setSelectedIndex={setSelectedIndex} actionOptions={actionOptions} />}
-		{display === 'main' && <Main actionOptions={actionOptions} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex}/>}
+        {display === 'main' && (
+          <Main actionOptions={actionOptions} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} />
+        )}
         {display === 'options' && <Options actionOptions={actionOptions} />}
       </SizeContext>
     </>
