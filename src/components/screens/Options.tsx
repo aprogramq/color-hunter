@@ -4,7 +4,7 @@ import { useContext, useState } from 'react'
 import fs from 'fs'
 import { Modal } from '../Modal'
 import { SizeContext } from '../..'
-import type { displayT, sizeT, UseState } from '../../types'
+import type { displayT, modalState, sizeT, UseState, modalT, optionsT } from '../../types'
 import os from 'os'
 import { useKeyboardOptions } from '../../keyboard'
 import { Hint } from '../Hints'
@@ -12,7 +12,11 @@ import { Hint } from '../Hints'
 export function Options({ actionOptions }: { actionOptions: (display: displayT) => void }) {
   const [positionFocusedInput, setPositionFocusedInput] = useState<number>(1)
   const [selectionMode, setSelectionMode] = useState<boolean>(true)
-  const [displayModalMessage, setDisplaySaveMessage] = useState<boolean>(false)
+  const [modal, setModal] = useState<modalT>({
+    display: false,
+    text: '',
+    state: 'success',
+  })
 
   const userName: string = os.userInfo().username
   const pathToSettingFile = `/home/${userName}/.config/color-hunter/settings.json`
@@ -22,23 +26,26 @@ export function Options({ actionOptions }: { actionOptions: (display: displayT) 
   const [sizeInput, setSizeInput] = useState<string>(settings['sizePalette'].toString())
 
   const size = useContext<sizeT>(SizeContext)
-  type newOption = 'savePath' | 'sizePalette'
 
   function saveNewOptions() {
     let option = ''
     if (positionFocusedInput === 1) option = 'savePath'
     else if (positionFocusedInput === 2) option = 'sizePalette'
 
+    if (parseInt(sizeInput) > 8) {
+      setModal({ text: 'Error: Max palette size is 8.', state: 'error', display: true })
+      setTimeout(() => setModal((p) => ({ ...p, display: false })), 2000)
+      return 0
+    }
+
     settings[option] = option === 'savePath' ? pathInput : parseInt(sizeInput)
     fs.writeFileSync(pathToSettingFile, JSON.stringify(settings, null, 4))
-    setDisplaySaveMessage(true)
-    setTimeout(() => setDisplaySaveMessage(false), 2000)
+    setModal({ text: 'Successfully', state: 'success', display: true })
+    setTimeout(() => setModal((p) => ({ ...p, display: false })), 2000)
     setSelectionMode(true)
   }
 
-  useKeyboardOptions(selectionMode, setSelectionMode, setPositionFocusedInput, saveNewOptions, actionOptions)
-
-  console.log(`Render - positionFocusedInput: ${positionFocusedInput}, selectionMode: ${selectionMode}`)
+  useKeyboardOptions({ selectionMode, setSelectionMode, setPositionFocusedInput, saveNewOptions, actionOptions })
 
   return (
     <>
@@ -75,12 +82,13 @@ export function Options({ actionOptions }: { actionOptions: (display: displayT) 
               focusedTextColor={'#4f46e5'}
               focused={positionFocusedInput === 2 && !selectionMode}
               textColor={positionFocusedInput === 2 && selectionMode ? '#4f46e5' : '#15133D'}
+              placeholder="Max size: 8"
             />
           </box>
         </box>
       </box>
       <Hint text={selectionMode ? '[E]xit' : '[Esc] to selection mode'} />
-      <Modal activate={displayModalMessage} />
+      <Modal activate={modal.display} state={modal.state} text={modal.text} />
     </>
   )
 }
