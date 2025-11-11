@@ -28,7 +28,7 @@ export default function Main({
 
   const [palette, setPalette] = useState<paletteT>({
     colors: [[]] as BaseHexColor[][],
-    size: settings['sizePalette'] > 10? 10: settings['sizePalette'],
+    size: settings['sizePalette'] > 8 ? 8 : settings['sizePalette'],
     display: false,
     position: 0,
   })
@@ -36,7 +36,7 @@ export default function Main({
   const size = useContext<sizeT>(SizeContext)
   const displayLogo = size.height > 13 || !palette.display
   const [displayModal, setDisplayModal] = useState<boolean>(false)
-  const [timeout, setMyTimeout] = useState<NodeJS.Timeout>()
+  const [timeout, setMyTimeout] = useState<NodeJS.Timeout>(setTimeout(() => void 1000))
 
   useEffect(() => {
     setMyTimeout(randomColor(palette, setPalette, options[selectedIndex]!.value))
@@ -57,10 +57,17 @@ export default function Main({
   }
 
   useKeyboardMain(states)
+  console.log(size.width)
+
+  const arrowPosition = () => {
+    if (palette.size <= 3) return size.width / (1.8 - palette.size * 0.1)
+    else if (palette.size <= 5) return size.width / (1.8 - palette.size * 0.09)
+    else if (palette.size <= 8) return size.width / (1.8 - palette.size * 0.085)
+  }
 
   return (
     <box alignItems="center" justifyContent="center" flexGrow={1} marginTop={1}>
-      <Modal activate={displayModal} />
+      <Modal activate={displayModal} state="success" text="Successfully" />
       <Header activate={displayLogo} />
       <Palette colorsPalette={palette.colors} position={palette.position} count={palette.size} />
 
@@ -68,14 +75,14 @@ export default function Main({
         fg="#ffffff"
         visible={pause}
         position="absolute"
-        right={size.width / 1.4}
+        right={arrowPosition()}
         top={size.height / 1.9}
       >{`${palette.position === 1 ? '' : '<-- [B]ack'}`}</text>
       <text
         fg="#ffffff"
         visible={pause}
         position="absolute"
-        left={size.width / 1.4}
+        left={arrowPosition()}
         top={size.height / 1.9}
       >{`${palette.position === palette.colors.length - 1 ? '' : '[N]ext -->'}`}</text>
 
