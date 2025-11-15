@@ -57,7 +57,6 @@ export default function Main({
   }
 
   useKeyboardMain(states)
-  console.log(size.width)
 
   const arrowPosition = () => {
     if (palette.size <= 3) return size.width / (1.8 - palette.size * 0.1)
