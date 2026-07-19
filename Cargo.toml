@@ -1,0 +1,17 @@
+[package]
+name = "color-hunter"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+
+[dependencies]
+arboard = {version= "3.6.1", features=["wayland-data-control"] }
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+palette = "0.7.6"
+rand = "0.10.1"
+ratatui = "0.30.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+tachyonfx = "0.25.1"
+toml = "1.1.2"
+users = "0.11.0"
