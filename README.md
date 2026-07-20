@@ -26,6 +26,15 @@
   or PNG.
 - **HEX, RGB, and HSL output** with human-readable color names.
 
+## Roadmap
+
+- [ ] **Ready-made palettes** — add a dedicated screen for browsing and copying
+  ready-made color palettes.
+- [ ] **More palette generators** — expand the collection of built-in templates
+  for generating color palettes.
+- [ ] **Custom generator API** — provide an API and integrate an embeddable
+  scripting language(lua?), so users can create their own palette
+  generation templates.
 
 ## Installation
 
