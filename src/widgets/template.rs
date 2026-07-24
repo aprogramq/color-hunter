@@ -144,7 +144,7 @@ impl TemplateWidget {
                 let max_offset = Generator::ALL.len().saturating_sub(visible_rows);
 
                 self.list_state.select(None);
-                let offset = self.list_state.offset().saturating_add(1).min(max_offset);
+                let offset = self.list_state.offset().saturating_add(2).min(max_offset);
                 *self.list_state.offset_mut() = offset;
             }
             MouseEventKind::ScrollUp if self.area.contains(position) => {
