@@ -9,7 +9,7 @@ pub mod speed;
 pub mod template;
 
 pub use keymap::Keymap;
-pub use popup::Popup;
+pub use popup::{ContextMenu, PaletteMenuAction, Popup};
 
 use ratatui::style::Color;
 pub const BACKGROUND_COLOR: Color = Color::Rgb(22, 22, 22);

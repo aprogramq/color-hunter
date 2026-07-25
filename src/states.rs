@@ -3,7 +3,10 @@ use std::fs;
 use std::time::Instant;
 use std::{error::Error, time::Duration};
 
-use ratatui::crossterm::event::{self, Event};
+use ratatui::{
+    crossterm::event::{self, Event},
+    layout::Position,
+};
 
 use crate::screens::palette::PaletteScreen;
 use crate::settings::Options;
@@ -29,6 +32,7 @@ pub enum Action {
     NavigateTo(Screen),
     Recreate(Screen),
     Unfocus,
+    OpenMenu(Position),
     PopupSuccess(String),
     PopupError(String),
 }

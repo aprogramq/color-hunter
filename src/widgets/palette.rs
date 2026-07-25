@@ -249,7 +249,7 @@ impl PaletteWidget {
                     self.selected_color = index;
                 }
                 self.focus = Some(Focus::Palette);
-                self.copy_colors()
+                Some(Action::OpenMenu(position))
             }
             MouseEventKind::Drag(MouseButton::Left) if self.mouse_selecting => {
                 if let Some(index) = hovered_color {
@@ -308,7 +308,7 @@ impl PaletteWidget {
         }
     }
 
-    fn copy_colors(&self) -> Option<Action> {
+    pub fn copy_colors(&self) -> Option<Action> {
         let colors = self.current_colors();
         let selected_colors = if let Some((start, end)) = self.selection_bounds(colors.len()) {
             &colors[start..=end]

@@ -1,4 +1,4 @@
-use ratatui::crossterm::event::{KeyEvent, MouseEvent};
+use ratatui::crossterm::event::{KeyEvent, MouseButton, MouseEvent, MouseEventKind};
 use ratatui::layout::{Constraint, Layout, Position, Rect};
 use std::fs;
 use std::time::Duration;
@@ -11,7 +11,7 @@ use crate::states::Action;
 use crate::utility::get_username;
 
 use crate::widgets::{
-    Popup,
+    ContextMenu, PaletteMenuAction, Popup,
     count::CountWidget,
     export::ExportWidget,
     keymap::Keymap,
@@ -51,6 +51,7 @@ pub struct PaletteScreen {
     export: ExportWidget,
     palette: PaletteWidget,
     popup: Option<Popup>,
+    palette_menu: Option<ContextMenu>,
 }
 const KEYMAPS: &[&str; 8] = &[
     "Stop: <space>",
@@ -90,6 +91,7 @@ impl PaletteScreen {
                 ),
             ),
             popup: None,
+            palette_menu: None,
         })
     }
 
@@ -104,16 +106,33 @@ impl PaletteScreen {
     pub fn mouse_handle(&mut self, mouse_event: MouseEvent) -> Option<Action> {
         let position = Position::new(mouse_event.column, mouse_event.row);
 
+        if self.palette_menu.is_some() {
+            if mouse_event.kind == MouseEventKind::Down(MouseButton::Right) {
+                self.palette_menu = None;
+            } else {
+                let menu_action = self
+                    .palette_menu
+                    .as_mut()
+                    .and_then(|menu| menu.handle_mouse(mouse_event.kind, position));
+                return menu_action.and_then(|action| self.handle_palette_menu_action(action));
+            }
+        }
+
         if self.export.is_active() {
             return self.export.handle_mouse(mouse_event.kind, position);
         }
 
         let palette_action = self.palette.handle_mouse(mouse_event.kind, position);
-        if matches!(
-            palette_action,
-            Some(Action::PopupSuccess(_)) | Some(Action::PopupError(_))
-        ) {
-            return Some(self.show_popup(palette_action.expect("popup action was matched")));
+        match palette_action {
+            Some(Action::OpenMenu(position)) => {
+                self.palette_menu = Some(ContextMenu::new(position));
+                return None;
+            }
+            Some(action @ (Action::PopupSuccess(_) | Action::PopupError(_))) => {
+                return Some(self.show_popup(action));
+            }
+            Some(action) => return Some(action),
+            None => {}
         }
 
         self.count
@@ -269,6 +288,9 @@ impl PaletteScreen {
 
         self.export.render(frame);
         self.render_popup(frame);
+        if let Some(menu) = self.palette_menu.as_mut() {
+            menu.render(frame);
+        }
     }
 
     fn render_widgets(&mut self, frame: &mut Frame, area: Rect) {
@@ -348,6 +370,24 @@ impl PaletteScreen {
             self.template.generate_palette(self.count.value),
             self.template.value,
         ));
+    }
+
+    fn handle_palette_menu_action(&mut self, action: PaletteMenuAction) -> Option<Action> {
+        self.palette_menu = None;
+        match action {
+            PaletteMenuAction::Copy => match self.palette.copy_colors() {
+                Some(action @ (Action::PopupSuccess(_) | Action::PopupError(_))) => {
+                    Some(self.show_popup(action))
+                }
+                action => action,
+            },
+            PaletteMenuAction::Export => {
+                self.palette.set_focus(None);
+                self.export.open();
+                None
+            }
+            PaletteMenuAction::Close => None,
+        }
     }
 
     fn show_popup(&mut self, action: Action) -> Action {
