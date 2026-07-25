@@ -62,7 +62,7 @@ impl ExportWidget {
             Block::bordered().title(" Export ").style(
                 Style::default()
                     .fg(super::FOREGROUND_COLOR)
-                    .bg(super::BACKGROUND_COLOR),
+                    .bg(super::POPUP_COLOR),
             ),
             area,
         );

@@ -48,14 +48,14 @@ impl Popup {
 
         let block = Block::bordered()
             .title(format!(" {title} "))
-            .style(Style::default().bg(super::BACKGROUND_COLOR))
+            .style(Style::default().bg(super::POPUP_COLOR))
             .title_style(Style::default().fg(title_color).bold())
             .border_style(Style::default().fg(border_color));
         let paragraph = Paragraph::new(message)
             .style(
                 Style::default()
                     .fg(super::FOREGROUND_COLOR)
-                    .bg(super::BACKGROUND_COLOR),
+                    .bg(super::POPUP_COLOR),
             )
             .block(block)
             .alignment(Alignment::Center);
