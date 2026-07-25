@@ -298,7 +298,7 @@ impl PaletteWidget {
                 }
                 None
             }
-            key!('c', NONE) => self.copy_colors(),
+            key!('c', NONE) | key!('y', NONE) => self.copy_colors(),
             key!('q', NONE) | key!(Esc) if self.has_selection() => {
                 self.clear_selection();
                 None

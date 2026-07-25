@@ -56,11 +56,11 @@ const KEYMAPS: &[&str; 8] = &[
     "Stop: <space>",
     "Running: <space>",
     "Generate: <space>",
-    "History: h/l || Switch: Tab || Export: e || Quit: Ctrl+c",
-    "Select: h/l || Range: Shift+V || Copy: c || Export: e || Cancel: q/Esc",
-    "Select: j/k || Apply: Enter || Cancel: q/Esc",
+    "History: h/l/←/→ || Switch: Tab || Export: e || Quit: Ctrl+c",
+    "Select: h/l/←/→ || Range: Shift+V || Copy: y/c || Export: e || Cancel: q/Esc",
+    "Select: j/k/↓/↑ || Apply: Enter || Cancel: q/Esc",
     "Apply: Enter || Cancel: q/Esc",
-    "Select: j/k || Switch: Tab || Export: Enter || Cancel: q/Esc || Quit: Ctrl+c",
+    "Select: j/k/↓/↑ || Switch: Tab || Export: Enter || Cancel: q/Esc || Quit: Ctrl+c",
 ];
 
 impl PaletteScreen {
