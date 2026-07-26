@@ -119,7 +119,18 @@ impl PaletteScreen {
         }
 
         if self.export.is_active() {
-            return self.export.handle_mouse(mouse_event.kind, position);
+            let action = self.export.handle_mouse(
+                mouse_event.kind,
+                position,
+                self.palette.selected_colors(),
+            );
+
+            return match action {
+                Some(action @ (Action::PopupSuccess(_) | Action::PopupError(_))) => {
+                    Some(self.show_popup(action))
+                }
+                action => action,
+            };
         }
 
         let palette_action = self.palette.handle_mouse(mouse_event.kind, position);

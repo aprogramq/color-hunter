@@ -1,20 +1,21 @@
 use palette::Srgb;
 use ratatui::{
     Frame,
-    crossterm::event::{KeyEvent, MouseEventKind},
-    layout::{Constraint, Flex, Layout, Margin, Position, Rect},
+    crossterm::event::{KeyEvent, MouseButton, MouseEventKind},
+    layout::{Alignment, Constraint, Flex, Layout, Margin, Position, Rect},
     style::Style,
-    widgets::{Block, Clear},
+    widgets::{Block, Clear, Paragraph},
 };
 
 use crate::{
     key,
-    states::Action,
-    states::ClipboardState,
+    states::{Action, ClipboardState},
     widgets::format::{
         ColorFormat, ColorFormatWidget, ExportData, ExportFormat, ExportFormatWidget,
     },
 };
+
+const BUTTON_WIDTH: u16 = 16;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum ExportState {
@@ -35,6 +36,7 @@ pub struct ExportWidget {
     state: ExportState,
     focus: ExportFocus,
     clipboard: ClipboardState,
+    button_area: Rect,
 }
 
 impl ExportWidget {
@@ -45,6 +47,7 @@ impl ExportWidget {
             state: ExportState::Closed,
             focus: ExportFocus::ExportFormat,
             clipboard: ClipboardState::default(),
+            button_area: Rect::default(),
         }
     }
 
@@ -56,7 +59,7 @@ impl ExportWidget {
     }
 
     fn render_popup(&mut self, frame: &mut Frame) {
-        let area = centered_rect(68, 11, frame.area());
+        let area = centered_rect(68, 12, frame.area());
         frame.render_widget(Clear, area);
         frame.render_widget(
             Block::bordered().title(" Export ").style(
@@ -71,25 +74,54 @@ impl ExportWidget {
             horizontal: 2,
             vertical: 1,
         });
-        let rows = Layout::vertical([Constraint::Length(7)])
-            .flex(Flex::Center)
-            .split(inner);
+        let rows = Layout::vertical([
+            Constraint::Length(1),
+            Constraint::Length(7),
+            Constraint::Length(1),
+            Constraint::Length(1),
+        ])
+        .split(inner);
         let columns = Layout::horizontal([
             Constraint::Percentage(55),
             Constraint::Length(1),
             Constraint::Percentage(45),
         ])
-        .split(rows[0]);
+        .split(rows[1]);
 
         self.export_format
             .render(frame, columns[0], self.focus == ExportFocus::ExportFormat);
         self.color_format
             .render(frame, columns[2], self.focus == ExportFocus::ColorFormat);
+        self.render_button(frame, rows[3]);
     }
 
-    pub fn handle_mouse(&mut self, kind: MouseEventKind, position: Position) -> Option<Action> {
+    fn render_button(&mut self, frame: &mut Frame, area: Rect) {
+        self.button_area = centered_rect(BUTTON_WIDTH.min(area.width), area.height.min(1), area);
+
+        let button = Paragraph::new("Export").alignment(Alignment::Center).style(
+            Style::default()
+                .fg(super::BACKGROUND_COLOR)
+                .bg(super::FOREGROUND_COLOR)
+                .bold(),
+        );
+
+        frame.render_widget(button, self.button_area);
+    }
+
+    pub fn handle_mouse(
+        &mut self,
+        kind: MouseEventKind,
+        position: Position,
+        colors: &[Srgb],
+    ) -> Option<Action> {
         if self.state == ExportState::Closed {
             return Some(Action::DelegateKeyUp);
+        }
+
+        if matches!(kind, MouseEventKind::Down(MouseButton::Left))
+            && self.button_area.contains(position)
+        {
+            return Some(self.confirm_export(colors));
         }
 
         if self.export_format.handle_mouse(kind, position) {
@@ -116,23 +148,7 @@ impl ExportWidget {
                     ExportFocus::ExportFormat => return self.export_format.handle_key(key_event),
                     ExportFocus::ColorFormat => return self.color_format.handle_key(key_event),
                 },
-                key!(Enter) => {
-                    self.export_format.apply();
-                    self.color_format.apply();
-                    let _ = self.export_format.save();
-                    let _ = self.color_format.save();
-
-                    let result = self.export_palette(colors);
-                    self.state = ExportState::Closed;
-                    return match result {
-                        Ok(()) => Some(Action::PopupSuccess(
-                            "Palette exported to clipboard!".to_string(),
-                        )),
-                        Err(error) => Some(Action::PopupError(format!(
-                            "Failed to export palette: {error}"
-                        ))),
-                    };
-                }
+                key!(Enter) => return Some(self.confirm_export(colors)),
                 key!('q', NONE) | key!(Esc) => {
                     self.state = ExportState::Closed;
                 }
@@ -141,6 +157,22 @@ impl ExportWidget {
         }
         None
     }
+
+    fn confirm_export(&mut self, colors: &[Srgb]) -> Action {
+        self.export_format.apply();
+        self.color_format.apply();
+        let _ = self.export_format.save();
+        let _ = self.color_format.save();
+
+        let result = self.export_palette(colors);
+        self.state = ExportState::Closed;
+
+        match result {
+            Ok(()) => Action::PopupSuccess("Palette exported to clipboard!".to_string()),
+            Err(error) => Action::PopupError(format!("Failed to export palette: {error}")),
+        }
+    }
+
     pub fn open(&mut self) {
         self.export_format.reset_selection();
         self.color_format.reset_selection();
