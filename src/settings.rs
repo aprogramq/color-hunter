@@ -1,5 +1,5 @@
 use crate::{
-    generator::harmony::Generator as GeneratorKind,
+    generator::harmony::Generator,
     widgets::{
         format::{ColorFormat, ExportFormat},
         mode::Mode,
@@ -17,12 +17,12 @@ pub struct Options {
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct PaletteOptions {
-    #[serde(default = "default_kind")]
-    pub kind: GeneratorKind,
+    #[serde(default = "default_template")]
+    pub template: Generator,
     #[serde(default = "default_count")]
     pub count: u8,
-    #[serde(default = "default_tick_rate")]
-    pub tick_rate: u64,
+    #[serde(default = "default_speed")]
+    pub speed: u64,
     #[serde(default = "default_mode")]
     pub mode: Mode,
 }
@@ -31,16 +31,16 @@ pub struct PaletteOptions {
 pub struct ExportOptions {
     #[serde(default = "default_export_format")]
     pub format: ExportFormat,
-    #[serde(default = "default_color_format")]
-    pub color_format: ColorFormat,
+    #[serde(default = "default_color")]
+    pub color: ColorFormat,
 }
 
 impl Default for PaletteOptions {
     fn default() -> Self {
         Self {
-            kind: default_kind(),
+            template: default_template(),
             count: default_count(),
-            tick_rate: default_tick_rate(),
+            speed: default_speed(),
             mode: default_mode(),
         }
     }
@@ -50,20 +50,20 @@ impl Default for ExportOptions {
     fn default() -> Self {
         Self {
             format: default_export_format(),
-            color_format: default_color_format(),
+            color: default_color(),
         }
     }
 }
 
-fn default_kind() -> GeneratorKind {
-    GeneratorKind::ColorHunter
+fn default_template() -> Generator {
+    Generator::ColorHunter
 }
 
 fn default_count() -> u8 {
     6
 }
 
-fn default_tick_rate() -> u64 {
+fn default_speed() -> u64 {
     200
 }
 
@@ -75,6 +75,6 @@ fn default_export_format() -> ExportFormat {
     ExportFormat::Css
 }
 
-fn default_color_format() -> ColorFormat {
+fn default_color() -> ColorFormat {
     ColorFormat::Hex
 }
