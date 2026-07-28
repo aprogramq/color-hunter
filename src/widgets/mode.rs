@@ -1,4 +1,3 @@
-use std::{error::Error, fs};
 
 use ratatui::{
     Frame,
@@ -9,8 +8,8 @@ use ratatui::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{effects::EFFECT_COLOR, screens::palette::Focus};
-use crate::{effects::FocusEffect, key, settings::Options, states::Action};
+use crate::{effects::EFFECT_COLOR, screens::palette::Focus, settings};
+use crate::{effects::FocusEffect, key, states::Action};
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -96,7 +95,7 @@ impl ModeWidget {
             key!(Tab) => return Some(Action::DelegateKeyUp),
             key!(Enter) => {
                 self.apply();
-                let _ = self.save();
+                let _ = settings::save(|option| option.palette.mode = self.value);
                 return Some(Action::Unfocus);
             }
             key!('j', NONE) | key!(Down) => {
@@ -114,19 +113,6 @@ impl ModeWidget {
             _ => return Some(Action::DelegateKeyUp),
         }
         None
-    }
-
-    pub fn save(&self) -> Result<(), Box<dyn Error>> {
-        let user = crate::utility::get_username();
-        let content =
-            fs::read_to_string(format!("/home/{}/.config/color-hunter/config.toml", user))?;
-        let mut options: Options = toml::from_str(&content)?;
-        options.palette.mode = self.value;
-        fs::write(
-            format!("/home/{}/.config/color-hunter/config.toml", user),
-            toml::to_string(&options)?,
-        )?;
-        Ok(())
     }
 
     pub fn apply(&mut self) {

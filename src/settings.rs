@@ -1,3 +1,4 @@
+use std::{error::Error, fs};
 use crate::{
     generator::harmony::Generator,
     widgets::{
@@ -77,4 +78,19 @@ fn default_export_format() -> ExportFormat {
 
 fn default_color() -> ColorFormat {
     ColorFormat::Hex
+}
+
+pub fn save(update: impl FnOnce(&mut Options)) -> Result<(), Box<dyn Error>> {
+    let user = crate::utility::get_username();
+    let content = fs::read_to_string(format!("/home/{}/.config/color-hunter/config.toml", user))?;
+    let mut options: Options = toml::from_str(&content)?;
+
+    update(&mut options);
+
+    fs::write(
+        format!("/home/{}/.config/color-hunter/config.toml", user),
+        toml::to_string(&options)?,
+    )?;
+
+    Ok(())
 }
