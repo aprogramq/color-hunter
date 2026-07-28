@@ -75,7 +75,10 @@ impl PaletteScreen {
         )?;
 
         let template = TemplateWidget::new(config.palette.template);
-        let normalized_count = config.palette.template.normalize_count(config.palette.count);
+        let normalized_count = config
+            .palette
+            .template
+            .normalize_count(config.palette.count);
 
         Ok(PaletteScreen {
             mode: ModeWidget::new(config.palette.mode),

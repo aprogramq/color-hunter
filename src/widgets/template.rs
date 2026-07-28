@@ -1,4 +1,3 @@
-use std::{error::Error, fs};
 
 use palette::Srgb;
 use ratatui::{
@@ -17,7 +16,7 @@ use crate::{
     },
     key,
     screens::palette::Focus,
-    settings::Options,
+    settings::{self},
     states::Action,
 };
 
@@ -161,7 +160,7 @@ impl TemplateWidget {
             key!(Tab) => return Some(Action::DelegateKeyUp),
             key!(Enter) => {
                 self.apply();
-                let _ = self.save();
+                let _ = settings::save(|option| option.palette.template = self.value);
                 return Some(Action::Unfocus);
             }
             key!('j', NONE) | key!(Down) => {
@@ -192,19 +191,6 @@ impl TemplateWidget {
             Generator::Coolors => Coolors::generate_palette(count),
             Generator::ColorHunter => ColorHunter::generate_palette(count),
         }
-    }
-
-    pub fn save(&self) -> Result<(), Box<dyn Error>> {
-        let user = crate::utility::get_username();
-        let content =
-            fs::read_to_string(format!("/home/{}/.config/color-hunter/config.toml", user))?;
-        let mut options: Options = toml::from_str(&content)?;
-        options.palette.template = self.value;
-        fs::write(
-            format!("/home/{}/.config/color-hunter/config.toml", user),
-            toml::to_string(&options)?,
-        )?;
-        Ok(())
     }
 
     pub fn apply(&mut self) {

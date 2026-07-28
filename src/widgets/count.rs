@@ -1,4 +1,4 @@
-use std::{error::Error, fs, time::Instant};
+use std::time::Instant;
 
 use ratatui::{
     Frame,
@@ -9,8 +9,8 @@ use ratatui::{
     widgets::{Block, Paragraph},
 };
 
-use crate::{effects::FocusEffect, generator::harmony::CountConstraint};
-use crate::{key, settings::Options, states::Action};
+use crate::{effects::FocusEffect, generator::harmony::CountConstraint, settings};
+use crate::{key, states::Action};
 use crate::{screens::palette::Focus, widgets::COMMENT_COLOR};
 
 #[derive(Clone, Debug)]
@@ -92,7 +92,7 @@ impl CountWidget {
             key!(Tab) => return Some(Action::DelegateKeyUp),
             key!(Enter) => {
                 self.apply_with_constraint(constraint);
-                let _ = self.save();
+                let _ = settings::save(|option| option.palette.count = self.value);
                 return Some(Action::Unfocus);
             }
             key!(Char(c)) if c.is_ascii_digit() => {
@@ -122,19 +122,7 @@ impl CountWidget {
     pub fn apply(&mut self) {
         self.value = self.input.parse().unwrap_or(1);
     }
-    pub fn save(&mut self) -> Result<(), Box<dyn Error>> {
-        let user = crate::utility::get_username();
-        let content =
-            fs::read_to_string(format!("/home/{}/.config/color-hunter/config.toml", user))?;
-        let mut options: Options = toml::from_str(&content)?;
-        options.palette.count = self.value;
-        fs::write(
-            format!("/home/{}/.config/color-hunter/config.toml", user),
-            toml::to_string(&options)?,
-        )?;
 
-        Ok(())
-    }
     pub fn apply_constraint(&mut self, constraint: &CountConstraint) {
         self.value = constraint.normalize(self.value);
         self.input = self.value.to_string();

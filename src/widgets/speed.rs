@@ -1,4 +1,4 @@
-use std::{error::Error, fs, time::Duration};
+use std::time::Duration;
 
 use ratatui::{
     Frame,
@@ -9,7 +9,12 @@ use ratatui::{
     widgets::{Block, Paragraph},
 };
 
-use crate::{effects::FocusEffect, key, settings::Options, states::Action};
+use crate::{
+    effects::FocusEffect,
+    key,
+    settings::{self},
+    states::Action,
+};
 use crate::{screens::palette::Focus, widgets::COMMENT_COLOR};
 
 const MIN_SPEED_MS: u64 = 100;
@@ -85,7 +90,9 @@ impl SpeedWidget {
             key!(Tab) => return Some(Action::DelegateKeyUp),
             key!(Enter) => {
                 self.apply();
-                let _ = self.save();
+                let _ =
+                    settings::save(|option| option.palette.speed = self.value.as_millis() as u64);
+
                 return Some(Action::Unfocus);
             }
             key!(Char(c)) if c.is_ascii_digit() => {
@@ -101,20 +108,6 @@ impl SpeedWidget {
             _ => return Some(Action::DelegateKeyUp),
         }
         None
-    }
-
-    pub fn save(&self) -> Result<(), Box<dyn Error>> {
-        let user = crate::utility::get_username();
-        let content =
-            fs::read_to_string(format!("/home/{}/.config/color-hunter/config.toml", user))?;
-        let mut options: Options = toml::from_str(&content)?;
-        options.palette.speed = self.value.as_millis() as u64;
-        fs::write(
-            format!("/home/{}/.config/color-hunter/config.toml", user),
-            toml::to_string(&options)?,
-        )?;
-
-        Ok(())
     }
 
     pub fn tick(&mut self, is_focused: bool) {

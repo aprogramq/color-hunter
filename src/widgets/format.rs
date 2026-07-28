@@ -1,4 +1,3 @@
-use std::{error::Error, fs};
 
 use image::{Rgba, RgbaImage};
 use palette::Srgb;
@@ -15,7 +14,6 @@ use crate::{
     color_names::palette_names,
     effects::{EFFECT_COLOR, FocusEffect},
     key,
-    settings::Options,
     states::Action,
 };
 
@@ -87,7 +85,6 @@ impl ColorFormatWidget {
             key!(Tab) => return Some(Action::DelegateKeyUp),
             key!(Enter) => {
                 self.apply();
-                let _ = self.save();
                 return Some(Action::Unfocus);
             }
             key!('j', NONE) | key!(Down) => {
@@ -100,19 +97,6 @@ impl ColorFormatWidget {
             _ => return Some(Action::DelegateKeyUp),
         }
         None
-    }
-
-    pub fn save(&self) -> Result<(), Box<dyn Error>> {
-        let user = crate::utility::get_username();
-        let content =
-            fs::read_to_string(format!("/home/{}/.config/color-hunter/config.toml", user))?;
-        let mut options: Options = toml::from_str(&content)?;
-        options.export.color = self.format;
-        fs::write(
-            format!("/home/{}/.config/color-hunter/config.toml", user),
-            toml::to_string(&options)?,
-        )?;
-        Ok(())
     }
 
     pub fn apply(&mut self) {
@@ -257,7 +241,6 @@ impl ExportFormatWidget {
             key!(Tab) => Some(Action::DelegateKeyUp),
             key!(Enter) => {
                 self.apply();
-                let _ = self.save();
                 Some(Action::Unfocus)
             }
             key!('j', NONE) | key!(Down) => {
@@ -283,19 +266,6 @@ impl ExportFormatWidget {
                 ExportData::Text(ExportFormat::tailwind(colors, color_format))
             }
         }
-    }
-
-    pub fn save(&self) -> Result<(), Box<dyn Error>> {
-        let user = crate::utility::get_username();
-        let content =
-            fs::read_to_string(format!("/home/{}/.config/color-hunter/config.toml", user))?;
-        let mut options: Options = toml::from_str(&content)?;
-        options.export.format = self.format;
-        fs::write(
-            format!("/home/{}/.config/color-hunter/config.toml", user),
-            toml::to_string(&options)?,
-        )?;
-        Ok(())
     }
 
     pub fn apply(&mut self) {

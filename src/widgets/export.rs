@@ -8,7 +8,7 @@ use ratatui::{
 };
 
 use crate::{
-    key,
+    key, settings,
     states::{Action, ClipboardState},
     widgets::format::{
         ColorFormat, ColorFormatWidget, ExportData, ExportFormat, ExportFormatWidget,
@@ -161,8 +161,9 @@ impl ExportWidget {
     fn confirm_export(&mut self, colors: &[Srgb]) -> Action {
         self.export_format.apply();
         self.color_format.apply();
-        let _ = self.export_format.save();
-        let _ = self.color_format.save();
+
+        let _ = settings::save(|option| option.export.format = self.export_format.format);
+        let _ = settings::save(|option| option.export.color = self.color_format.format);
 
         let result = self.export_palette(colors);
         self.state = ExportState::Closed;
