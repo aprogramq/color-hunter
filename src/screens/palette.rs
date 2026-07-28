@@ -74,20 +74,20 @@ impl PaletteScreen {
             .to_string(),
         )?;
 
-        let template = TemplateWidget::new(config.palette.kind);
-        let normalized_count = config.palette.kind.normalize_count(config.palette.count);
+        let template = TemplateWidget::new(config.palette.template);
+        let normalized_count = config.palette.template.normalize_count(config.palette.count);
 
         Ok(PaletteScreen {
             mode: ModeWidget::new(config.palette.mode),
-            template: TemplateWidget::new(config.palette.kind),
+            template: TemplateWidget::new(config.palette.template),
             count: CountWidget::new(normalized_count),
-            speed: SpeedWidget::new(Duration::from_millis(config.palette.tick_rate)),
-            export: ExportWidget::new(config.export.format, config.export.color_format),
+            speed: SpeedWidget::new(Duration::from_millis(config.palette.speed)),
+            export: ExportWidget::new(config.export.format, config.export.color),
             palette: PaletteWidget::new(
                 config.palette.mode == Mode::Running,
                 Palette::new(
                     template.generate_palette(config.palette.count),
-                    config.palette.kind,
+                    config.palette.template,
                 ),
             ),
             popup: None,

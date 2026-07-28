@@ -108,7 +108,7 @@ impl SpeedWidget {
         let content =
             fs::read_to_string(format!("/home/{}/.config/color-hunter/config.toml", user))?;
         let mut options: Options = toml::from_str(&content)?;
-        options.palette.tick_rate = self.value.as_millis() as u64;
+        options.palette.speed = self.value.as_millis() as u64;
         fs::write(
             format!("/home/{}/.config/color-hunter/config.toml", user),
             toml::to_string(&options)?,

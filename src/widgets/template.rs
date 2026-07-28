@@ -199,7 +199,7 @@ impl TemplateWidget {
         let content =
             fs::read_to_string(format!("/home/{}/.config/color-hunter/config.toml", user))?;
         let mut options: Options = toml::from_str(&content)?;
-        options.palette.kind = self.value;
+        options.palette.template = self.value;
         fs::write(
             format!("/home/{}/.config/color-hunter/config.toml", user),
             toml::to_string(&options)?,
