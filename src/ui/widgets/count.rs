@@ -9,9 +9,10 @@ use ratatui::{
     widgets::{Block, Paragraph},
 };
 
-use crate::{effects::FocusEffect, generator::harmony::CountConstraint, settings};
-use crate::{key, states::Action};
-use crate::{screens::palette::Focus, widgets::COMMENT_COLOR};
+use crate::app::{settings, state::Action};
+use crate::generator::harmony::CountConstraint;
+use crate::key;
+use crate::ui::{effects::FocusEffect, screens::palette::Focus, widgets::COMMENT_COLOR};
 
 #[derive(Clone, Debug)]
 pub struct CountWidget {

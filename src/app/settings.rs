@@ -1,12 +1,10 @@
-use std::{error::Error, fs};
 use crate::{
+    app::export::{ColorExport, TargetExport},
     generator::harmony::Generator,
-    widgets::{
-        format::{ColorFormat, ExportFormat},
-        mode::Mode,
-    },
+    ui::widgets::mode::Mode,
 };
 use serde::{Deserialize, Serialize};
+use std::{error::Error, fs};
 
 #[derive(Clone, Serialize, Deserialize, Default)]
 pub struct Options {
@@ -31,9 +29,9 @@ pub struct PaletteOptions {
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ExportOptions {
     #[serde(default = "default_export_format")]
-    pub format: ExportFormat,
+    pub format: TargetExport,
     #[serde(default = "default_color")]
-    pub color: ColorFormat,
+    pub color: ColorExport,
 }
 
 impl Default for PaletteOptions {
@@ -72,12 +70,12 @@ fn default_mode() -> Mode {
     Mode::Running
 }
 
-fn default_export_format() -> ExportFormat {
-    ExportFormat::Css
+fn default_export_format() -> TargetExport {
+    TargetExport::Css
 }
 
-fn default_color() -> ColorFormat {
-    ColorFormat::Hex
+fn default_color() -> ColorExport {
+    ColorExport::Hex
 }
 
 pub fn save(update: impl FnOnce(&mut Options)) -> Result<(), Box<dyn Error>> {

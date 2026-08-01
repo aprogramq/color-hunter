@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-use crate::effects::{FocusEffect, ShowEffect};
+use crate::ui::effects::{FocusEffect, ShowEffect};
 
 use ratatui::{
     Frame,

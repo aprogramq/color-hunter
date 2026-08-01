@@ -8,11 +8,14 @@ use ratatui::{
 };
 
 use crate::{
-    key, settings,
-    states::{Action, ClipboardState},
-    widgets::format::{
-        ColorFormat, ColorFormatWidget, ExportData, ExportFormat, ExportFormatWidget,
+    app::{
+        clipboard::Clipboard,
+        export::{ColorExport, ExportData, TargetExport},
+        settings,
+        state::Action,
     },
+    key,
+    ui::widgets::format::{ColorFormatWidget, ExportFormatWidget},
 };
 
 const BUTTON_WIDTH: u16 = 16;
@@ -35,18 +38,18 @@ pub struct ExportWidget {
     color_format: ColorFormatWidget,
     state: ExportState,
     focus: ExportFocus,
-    clipboard: ClipboardState,
+    clipboard: Clipboard,
     button_area: Rect,
 }
 
 impl ExportWidget {
-    pub fn new(export_format: ExportFormat, color_format: ColorFormat) -> Self {
+    pub fn new(export_format: TargetExport, color_format: ColorExport) -> Self {
         Self {
             export_format: ExportFormatWidget::new(export_format),
             color_format: ColorFormatWidget::new(color_format),
             state: ExportState::Closed,
             focus: ExportFocus::ExportFormat,
-            clipboard: ClipboardState::default(),
+            clipboard: Clipboard::default(),
             button_area: Rect::default(),
         }
     }
