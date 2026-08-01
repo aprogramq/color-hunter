@@ -1,4 +1,3 @@
-
 use ratatui::{
     Frame,
     crossterm::event::{KeyEvent, MouseButton, MouseEventKind},
@@ -8,8 +7,12 @@ use ratatui::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{effects::EFFECT_COLOR, screens::palette::Focus, settings};
-use crate::{effects::FocusEffect, key, states::Action};
+use crate::app::{settings, state::Action};
+use crate::key;
+use crate::ui::{
+    effects::{EFFECT_COLOR, FocusEffect},
+    screens::palette::Focus,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]

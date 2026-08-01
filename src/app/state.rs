@@ -8,13 +8,11 @@ use ratatui::{
     layout::Position,
 };
 
-use crate::screens::palette::PaletteScreen;
-use crate::settings::Options;
-use crate::states::Action::NavigateTo;
+use self::Action::NavigateTo;
+use super::settings::Options;
+use crate::ui::screens::palette::PaletteScreen;
 use crate::utility::get_username;
 
-use arboard::{Clipboard, ImageData};
-use std::{borrow::Cow, cell::RefCell, fmt, rc::Rc};
 
 #[derive(Clone, PartialEq)]
 #[repr(usize)]
@@ -117,51 +115,5 @@ impl StateManagment {
             }
         }
         Ok(None)
-    }
-}
-
-#[derive(Clone, Default)]
-pub struct ClipboardState {
-    clipboard: Rc<RefCell<Option<Clipboard>>>,
-}
-
-impl ClipboardState {
-    pub fn set_text(&self, text: String) -> Result<(), arboard::Error> {
-        let mut clipboard = self.clipboard.borrow_mut();
-        if clipboard.is_none() {
-            *clipboard = Some(Clipboard::new()?);
-        }
-
-        clipboard
-            .as_mut()
-            .expect("clipboard was initialized")
-            .set_text(text)
-    }
-
-    pub fn set_image(&self, image: image::RgbaImage) -> Result<(), arboard::Error> {
-        let (width, height) = image.dimensions();
-        let data = ImageData {
-            width: width as usize,
-            height: height as usize,
-            bytes: Cow::Owned(image.into_raw()),
-        };
-
-        let mut clipboard = self.clipboard.borrow_mut();
-        if clipboard.is_none() {
-            *clipboard = Some(Clipboard::new()?);
-        }
-        clipboard
-            .as_mut()
-            .expect("clipboard was initialized")
-            .set_image(data)
-    }
-}
-
-impl fmt::Debug for ClipboardState {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter
-            .debug_struct("ClipboardState")
-            .field("initialized", &self.clipboard.borrow().is_some())
-            .finish()
     }
 }

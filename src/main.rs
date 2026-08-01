@@ -1,12 +1,9 @@
+pub mod app;
 mod color_names;
-pub mod effects;
 pub mod generator;
 pub mod macros;
-pub mod screens;
-pub mod settings;
-pub mod states;
+pub mod ui;
 pub mod utility;
-pub mod widgets;
 
 use std::{error::Error, io::stdout};
 
@@ -20,11 +17,7 @@ use ratatui::{
     widgets::Block,
 };
 
-use crate::states::{
-    Action,
-    Screen::{self},
-    StateManagment,
-};
+use crate::app::state::{Action, Screen, StateManagment};
 fn main() -> Result<(), Box<dyn Error>> {
     let terminal = ratatui::init();
     let state = StateManagment::init()?;
@@ -49,7 +42,7 @@ fn run(mut terminal: DefaultTerminal, mut state: StateManagment) -> Result<(), B
 
 fn view(frame: &mut Frame, state: &mut StateManagment) {
     frame.render_widget(
-        Block::new().style(Style::new().bg(widgets::BACKGROUND_COLOR)),
+        Block::new().style(Style::new().bg(ui::widgets::BACKGROUND_COLOR)),
         frame.area(),
     );
 

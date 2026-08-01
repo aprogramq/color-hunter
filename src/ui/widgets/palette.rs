@@ -11,15 +11,14 @@ use ratatui::prelude::Color;
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Paragraph};
 
-use crate::effects::FocusEffect;
-use crate::generator::harmony::Generator;
-use crate::screens::palette::Focus;
-use crate::states::ClipboardState;
-use crate::{
-    key,
-    states::Action,
-    widgets::format::{ColorFormat, format_color},
+use crate::app::{
+    clipboard::Clipboard,
+    export::{ColorExport, format_color},
+    state::Action,
 };
+use crate::generator::harmony::Generator;
+use crate::key;
+use crate::ui::{effects::FocusEffect, screens::palette::Focus};
 
 const COLOR_WIDTH: u16 = 12;
 const FOCUSED_COLOR_WIDTH: u16 = 16;
@@ -47,7 +46,7 @@ impl Palette {
 pub struct PaletteWidget {
     focus_effect: FocusEffect,
     area: Rect,
-    clipboard: ClipboardState,
+    clipboard: Clipboard,
     selected_color: usize,
     selection_anchor: Option<usize>,
     mouse_selecting: bool,
@@ -63,7 +62,7 @@ impl PaletteWidget {
         Self {
             focus_effect: FocusEffect::border(),
             area: Rect::default(),
-            clipboard: ClipboardState::default(),
+            clipboard: Clipboard::default(),
             selected_color: 0,
             selection_anchor: None,
             mouse_selecting: false,
@@ -320,7 +319,7 @@ impl PaletteWidget {
         };
         let text = selected_colors
             .iter()
-            .map(|color| format_color(color, ColorFormat::Hex))
+            .map(|color| format_color(color, ColorExport::Hex))
             .collect::<Vec<_>>()
             .join("\n");
         let count = selected_colors.len();

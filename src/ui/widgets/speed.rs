@@ -10,12 +10,10 @@ use ratatui::{
 };
 
 use crate::{
-    effects::FocusEffect,
+    app::{settings, state::Action},
     key,
-    settings::{self},
-    states::Action,
+    ui::{effects::FocusEffect, screens::palette::Focus, widgets::COMMENT_COLOR},
 };
-use crate::{screens::palette::Focus, widgets::COMMENT_COLOR};
 
 const MIN_SPEED_MS: u64 = 100;
 

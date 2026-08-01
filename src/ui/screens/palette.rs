@@ -5,12 +5,11 @@ use std::time::Duration;
 
 use ratatui::Frame;
 
+use crate::app::{settings::Options, state::Action};
 use crate::key;
-use crate::settings::Options;
-use crate::states::Action;
 use crate::utility::get_username;
 
-use crate::widgets::{
+use crate::ui::widgets::{
     ContextMenu, PaletteMenuAction, Popup,
     count::CountWidget,
     export::ExportWidget,

@@ -1,4 +1,3 @@
-
 use palette::Srgb;
 use ratatui::{
     Frame,
@@ -10,14 +9,15 @@ use ratatui::{
 };
 
 use crate::{
-    effects::{EFFECT_COLOR, FocusEffect},
+    app::{settings, state::Action},
     generator::harmony::{
         Analogus, ColorHunter, Complementary, Coolors, Generator, SplitComplementary, Triadic,
     },
     key,
-    screens::palette::Focus,
-    settings::{self},
-    states::Action,
+    ui::{
+        effects::{EFFECT_COLOR, FocusEffect},
+        screens::palette::Focus,
+    },
 };
 
 const ITEMS: &[&str] = &[
