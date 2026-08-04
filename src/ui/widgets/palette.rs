@@ -12,7 +12,7 @@ use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Paragraph};
 
 use crate::app::{
-    clipboard::Clipboard,
+    clipboard::ClipboardContent,
     export::{ColorExport, format_color},
     state::Action,
 };
@@ -46,7 +46,6 @@ impl Palette {
 pub struct PaletteWidget {
     focus_effect: FocusEffect,
     area: Rect,
-    clipboard: Clipboard,
     selected_color: usize,
     selection_anchor: Option<usize>,
     mouse_selecting: bool,
@@ -62,7 +61,6 @@ impl PaletteWidget {
         Self {
             focus_effect: FocusEffect::border(),
             area: Rect::default(),
-            clipboard: Clipboard::default(),
             selected_color: 0,
             selection_anchor: None,
             mouse_selecting: false,
@@ -324,16 +322,15 @@ impl PaletteWidget {
             .join("\n");
         let count = selected_colors.len();
 
-        match self.clipboard.set_text(text) {
-            Ok(()) => Some(Action::PopupSuccess(if count == 1 {
+        Some(Action::CopyToClipboard {
+            content: ClipboardContent::Text(text),
+            success_message: if count == 1 {
                 "Color copied to clipboard!".to_string()
             } else {
                 format!("{count} colors copied to clipboard!")
-            })),
-            Err(error) => Some(Action::PopupError(format!(
-                "Failed to copy colors: {error}"
-            ))),
-        }
+            },
+            error_message: "Failed to copy colors".to_string(),
+        })
     }
     pub fn push_palette(&mut self, palette: Palette) {
         if self.history.len() == HISTORY_LIMIT {
