@@ -403,7 +403,7 @@ impl PaletteScreen {
         }
     }
 
-    fn show_popup(&mut self, action: Action) -> Action {
+    pub fn show_popup(&mut self, action: Action) -> Action {
         self.popup = match action {
             Action::PopupSuccess(message) => Some(Popup::success_message(message)),
             Action::PopupError(message) => Some(Popup::error_message(message)),

@@ -3,13 +3,15 @@ use std::fs;
 use std::time::Instant;
 use std::{error::Error, time::Duration};
 
+use arboard::Clipboard;
 use ratatui::{
     crossterm::event::{self, Event},
     layout::Position,
 };
 
 use self::Action::NavigateTo;
-use super::settings::Options;
+use super::{clipboard::ClipboardContent, settings::Options};
+use crate::app::clipboard;
 use crate::ui::screens::palette::PaletteScreen;
 use crate::utility::get_username;
 
@@ -33,21 +35,24 @@ pub enum Action {
     OpenMenu(Position),
     PopupSuccess(String),
     PopupError(String),
+    CopyToClipboard {
+        content: ClipboardContent,
+        success_message: String,
+        error_message: String,
+    },
 }
 
-#[derive(Clone)]
 pub struct Objects {
     pub palette: PaletteScreen,
 }
-#[derive(Clone)]
 struct DrawTime {
     time: u64,
     reset_at: Option<Instant>,
 }
-#[derive(Clone)]
 pub struct StateManagment {
     pub current_screen: Screen,
     pub screens: Objects,
+    clipboard: Clipboard,
     draw_time: DrawTime,
 }
 
@@ -62,6 +67,7 @@ impl StateManagment {
             screens: Objects {
                 palette: PaletteScreen::new()?,
             },
+            clipboard: Clipboard::new()?,
             draw_time: DrawTime {
                 time: 100,
                 reset_at: None,
@@ -102,17 +108,38 @@ impl StateManagment {
                 },
                 _ => None,
             };
-            match action {
-                Some(NavigateTo(screen)) => self.set_screen(screen),
-                Some(Action::Exit) => return Ok(Some(Action::Exit)),
-                Some(Action::DrawTime(millis, timeout)) => {
-                    let draw_time = &mut self.draw_time;
-
-                    draw_time.time = millis;
-                    draw_time.reset_at = Some(Instant::now() + Duration::from_millis(timeout))
-                }
-                _ => (),
+            if let Some(action) = action {
+                return self.handle_action(action);
             }
+        }
+        Ok(None)
+    }
+
+    fn handle_action(&mut self, action: Action) -> Result<Option<Action>, Box<dyn Error>> {
+        match action {
+            NavigateTo(screen) => self.set_screen(screen),
+            Action::Exit => return Ok(Some(Action::Exit)),
+            Action::DrawTime(millis, timeout) => {
+                self.draw_time.time = millis;
+                self.draw_time.reset_at = Some(Instant::now() + Duration::from_millis(timeout));
+            }
+            Action::CopyToClipboard {
+                content,
+                success_message,
+                error_message,
+            } => {
+                let popup = match clipboard::set(&mut self.clipboard, content) {
+                    Ok(()) => Action::PopupSuccess(success_message),
+                    Err(error) => Action::PopupError(format!("{error_message}: {error}")),
+                };
+                let draw_action = self.screens.palette.show_popup(popup);
+                return self.handle_action(draw_action);
+            }
+            action @ (Action::PopupSuccess(_) | Action::PopupError(_)) => {
+                let draw_action = self.screens.palette.show_popup(action);
+                return self.handle_action(draw_action);
+            }
+            _ => {}
         }
         Ok(None)
     }

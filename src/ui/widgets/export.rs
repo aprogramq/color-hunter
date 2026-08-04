@@ -9,7 +9,7 @@ use ratatui::{
 
 use crate::{
     app::{
-        clipboard::Clipboard,
+        clipboard::ClipboardContent,
         export::{ColorExport, ExportData, TargetExport},
         settings,
         state::Action,
@@ -38,7 +38,6 @@ pub struct ExportWidget {
     color_format: ColorFormatWidget,
     state: ExportState,
     focus: ExportFocus,
-    clipboard: Clipboard,
     button_area: Rect,
 }
 
@@ -49,7 +48,6 @@ impl ExportWidget {
             color_format: ColorFormatWidget::new(color_format),
             state: ExportState::Closed,
             focus: ExportFocus::ExportFormat,
-            clipboard: Clipboard::default(),
             button_area: Rect::default(),
         }
     }
@@ -168,12 +166,16 @@ impl ExportWidget {
         let _ = settings::save(|option| option.export.format = self.export_format.format);
         let _ = settings::save(|option| option.export.color = self.color_format.format);
 
-        let result = self.export_palette(colors);
+        let content = match self.export_format.export(colors, self.color_format.format) {
+            ExportData::Text(text) => ClipboardContent::Text(text),
+            ExportData::Image(image) => ClipboardContent::Image(image),
+        };
         self.state = ExportState::Closed;
 
-        match result {
-            Ok(()) => Action::PopupSuccess("Palette exported to clipboard!".to_string()),
-            Err(error) => Action::PopupError(format!("Failed to export palette: {error}")),
+        Action::CopyToClipboard {
+            content,
+            success_message: "Palette exported to clipboard!".to_string(),
+            error_message: "Failed to export palette".to_string(),
         }
     }
 
@@ -186,13 +188,6 @@ impl ExportWidget {
 
     pub fn is_active(&self) -> bool {
         self.state != ExportState::Closed
-    }
-
-    fn export_palette(&self, colors: &[Srgb]) -> Result<(), arboard::Error> {
-        match self.export_format.export(colors, self.color_format.format) {
-            ExportData::Text(text) => self.clipboard.set_text(text),
-            ExportData::Image(image) => self.clipboard.set_image(image),
-        }
     }
 }
 
