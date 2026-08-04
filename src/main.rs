@@ -19,8 +19,8 @@ use ratatui::{
 
 use crate::app::state::{Action, Screen, StateManagment};
 fn main() -> Result<(), Box<dyn Error>> {
-    let terminal = ratatui::init();
     let state = StateManagment::init()?;
+    let terminal = ratatui::init();
 
     execute!(stdout(), EnableMouseCapture)?;
     run(terminal, state)?;
