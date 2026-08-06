@@ -15,7 +15,6 @@ use crate::app::clipboard;
 use crate::ui::screens::palette::PaletteScreen;
 use crate::utility::get_username;
 
-
 #[derive(Clone, PartialEq)]
 #[repr(usize)]
 pub enum Screen {
@@ -74,6 +73,7 @@ impl StateManagment {
             },
         })
     }
+
     fn init_config(config_path: &String) -> Result<(), Box<dyn std::error::Error>> {
         let new_options = Options::default();
         fs::create_dir_all(format!("{}/", config_path))?;
@@ -83,21 +83,10 @@ impl StateManagment {
         )?;
         Ok(())
     }
-    pub fn get_screens(&mut self) -> &mut PaletteScreen {
-        &mut self.screens.palette
-    }
-    pub fn set_screen(&mut self, screen: Screen) {
-        self.current_screen = screen
-    }
+
     pub fn event(&mut self) -> Result<Option<Action>, Box<dyn Error>> {
-        if self
-            .draw_time
-            .reset_at
-            .is_some_and(|reset| Instant::now() > reset)
-        {
-            self.draw_time.time = 100;
-            self.draw_time.reset_at = None;
-        }
+        self.restore_draw_time_if_due();
+
         if event::poll(Duration::from_millis(self.draw_time.time))? {
             let action = match event::read()? {
                 Event::Key(key_event) => match self.current_screen {
@@ -142,5 +131,25 @@ impl StateManagment {
             _ => {}
         }
         Ok(None)
+    }
+
+    fn restore_draw_time_if_due(&mut self) {
+        if self
+            .draw_time
+            .reset_at
+            .is_some_and(|reset| Instant::now() > reset)
+        {
+            self.draw_time.time = 100;
+            self.draw_time.reset_at = None;
+        }
+    }
+
+    #[allow(dead_code)]
+    fn get_screens(&mut self) -> &mut PaletteScreen {
+        &mut self.screens.palette
+    }
+
+    fn set_screen(&mut self, screen: Screen) {
+        self.current_screen = screen
     }
 }

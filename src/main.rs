@@ -7,6 +7,7 @@ pub mod utility;
 
 use std::{error::Error, io::stdout};
 
+use crate::app::state::{Action, Screen, StateManagment};
 use ratatui::{
     DefaultTerminal, Frame,
     crossterm::{
@@ -17,7 +18,6 @@ use ratatui::{
     widgets::Block,
 };
 
-use crate::app::state::{Action, Screen, StateManagment};
 fn main() -> Result<(), Box<dyn Error>> {
     let state = StateManagment::init()?;
     let terminal = ratatui::init();
