@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Specify the version"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version
+        shell: bash
+        run: |
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must look like v0.0.0"
+            exit 1
+          fi
+
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "Tag $VERSION already exists."
+            exit 1
+          fi
+
+          echo "PACKAGE_VERSION=${VERSION#v}" >> "$GITHUB_ENV"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.98.0"
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Set package version
+        shell: bash
+        run: |
+          sed -i "0,/^version = \".*\"$/s//version = \"$PACKAGE_VERSION\"/" Cargo.toml
+          cargo metadata --format-version 1 > /dev/null
+
+      - name: Build release binary
+        run: cargo build --release --locked
+
+      - name: Prepare release binary
+        shell: bash
+        run: |
+          binary="color-hunter-linux-x86_64"
+          cp target/release/color-hunter "$binary"
+
+      - name: Commit version and create tag
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Cargo.toml Cargo.lock
+          git commit -m "release $VERSION"
+          git tag -a "$VERSION" -m "Release $VERSION"
+          git push origin "HEAD:${GITHUB_REF_NAME}" "$VERSION"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          binary="color-hunter-linux-x86_64"
+          gh release create "$VERSION" \
+            "$binary" \
+            --title "$VERSION" \
+            --draft \
+            --notes ""
