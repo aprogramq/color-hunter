@@ -89,10 +89,19 @@ impl ExportWidget {
         ])
         .split(rows[1]);
 
+        let show_color_format = self.show_color_format();
+        let export_area = if show_color_format {
+            columns[0]
+        } else {
+            centered_rect(columns[0].width, rows[1].height, rows[1])
+        };
+
         self.export_format
-            .render(frame, columns[0], self.focus == ExportFocus::ExportFormat);
-        self.color_format
-            .render(frame, columns[2], self.focus == ExportFocus::ColorFormat);
+            .render(frame, export_area, self.focus == ExportFocus::ExportFormat);
+        if show_color_format {
+            self.color_format
+                .render(frame, columns[2], self.focus == ExportFocus::ColorFormat);
+        }
         self.render_button(frame, rows[3]);
     }
 
@@ -127,7 +136,7 @@ impl ExportWidget {
 
         if self.export_format.handle_mouse(kind, position) {
             self.focus = ExportFocus::ExportFormat;
-        } else if self.color_format.handle_mouse(kind, position) {
+        } else if self.show_color_format() && self.color_format.handle_mouse(kind, position) {
             self.focus = ExportFocus::ColorFormat;
         }
 
@@ -140,10 +149,12 @@ impl ExportWidget {
             ExportState::Selecting => match key_event {
                 key!('c', CONTROL) => return Some(Action::Exit),
                 key!(Tab) => {
-                    self.focus = match self.focus {
-                        ExportFocus::ExportFormat => ExportFocus::ColorFormat,
-                        ExportFocus::ColorFormat => ExportFocus::ExportFormat,
-                    };
+                    if self.show_color_format() {
+                        self.focus = match self.focus {
+                            ExportFocus::ExportFormat => ExportFocus::ColorFormat,
+                            ExportFocus::ColorFormat => ExportFocus::ExportFormat,
+                        };
+                    }
                 }
                 key!('j', NONE) | key!('k', NONE) | key!(Down) | key!(Up) => match self.focus {
                     ExportFocus::ExportFormat => return self.export_format.handle_key(key_event),
@@ -161,7 +172,9 @@ impl ExportWidget {
 
     fn confirm_export(&mut self, colors: &[Srgb]) -> Action {
         self.export_format.apply();
-        self.color_format.apply();
+        if self.show_color_format() {
+            self.color_format.apply();
+        }
 
         let _ = settings::save(|option| option.export.format = self.export_format.format);
         let _ = settings::save(|option| option.export.color = self.color_format.format);
@@ -188,6 +201,13 @@ impl ExportWidget {
 
     pub fn is_active(&self) -> bool {
         self.state != ExportState::Closed
+    }
+
+    fn show_color_format(&self) -> bool {
+        matches!(
+            self.export_format.selected_format(),
+            TargetExport::Css | TargetExport::Scss | TargetExport::Tailwind
+        )
     }
 }
 

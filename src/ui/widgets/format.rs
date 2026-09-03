@@ -192,6 +192,13 @@ impl ExportFormatWidget {
         }
     }
 
+    pub fn selected_format(&self) -> TargetExport {
+        self.list_state
+            .selected()
+            .map(|selected| TargetExport::ALL[selected])
+            .unwrap_or(self.format)
+    }
+
     pub fn export(&self, colors: &[Srgb], color_format: ColorExport) -> ExportData {
         match self.format {
             TargetExport::Css => ExportData::Text(TargetExport::css(colors, color_format)),
