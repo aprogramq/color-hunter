@@ -39,7 +39,7 @@
 ## Installation
 
 Color Hunter currently targets Linux. You
-need [Rust 1.85+](https://www.rust-lang.org/tools/install) and a terminal with
+need [Rust 1.88+](https://www.rust-lang.org/tools/install) and a terminal with
 True Color support.
 
 ```bash
